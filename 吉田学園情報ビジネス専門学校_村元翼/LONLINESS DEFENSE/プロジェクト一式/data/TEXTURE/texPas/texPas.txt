@@ -1,0 +1,40 @@
+//==================================================
+//テクスチャのパス読み込み用ファイル
+//Author加藤瑞葵
+//==================================================
+
+//テクスチャ最大数
+TEX_NUM = 13
+
+//空
+PAS = data/TEXTURE/sky.jpg
+NAME = TEX_TYPE_SKY
+
+//床
+PAS = data/TEXTURE/floor_000.jpg
+NAME = TEX_TYPE_DUNGEON_FLOOR
+
+//文字
+PAS = data/TEXTURE/A.png
+NAME = TEX_TYPE_A
+PAS = data/TEXTURE/B.png
+NAME = TEX_TYPE_B
+PAS = data/TEXTURE/X.png
+NAME = TEX_TYPE_X
+PAS = data/TEXTURE/Y.png
+NAME = TEX_TYPE_Y
+PAS = data/TEXTURE/W.png
+NAME = TEX_TYPE_W
+PAS = data/TEXTURE/S.png
+NAME = TEX_TYPE_S
+PAS = data/TEXTURE/up.png
+NAME = TEX_TYPE_UP
+PAS = data/TEXTURE/down.png
+NAME = TEX_TYPE_DOWN
+PAS = data/TEXTURE/left.png
+NAME = TEX_TYPE_LEFT
+PAS = data/TEXTURE/right.png
+NAME = TEX_TYPE_RIGHT
+//文字背景
+PAS = data/TEXTURE/sign_bg.png
+NAME = TEX_TYPE_SIGN_BG
