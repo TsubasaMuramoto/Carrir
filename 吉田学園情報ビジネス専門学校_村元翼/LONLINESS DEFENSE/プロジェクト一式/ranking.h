@@ -1,6 +1,5 @@
 //===========================================
 //ランキング処理
-//Author:加藤瑞葵
 //===========================================
 #ifndef _RANKING_H_
 #define _RANKING_H_
@@ -13,7 +12,6 @@
 //前方宣言
 //================================================
 class CScene2D;
-//class CUi;
 
 //================================================
 //マクロ定義
@@ -49,13 +47,11 @@ public:
 	static CRanking *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size);
 
 private:
-	static CScore *m_apScore[MAX_RANKING];
-
+	static CScore *m_apScore[MAX_RANKING];	// スコアクラス
+	CScene2D *m_apScene2D[MAX_RANKING];		// シーン２?クラス
 	int m_nScore[MAX_SCORE_DATA];			// スコア
 	int m_nNowScore;						// 今回のスコア
 	D3DCOLORVALUE	m_col;					// カラー
-	CScene2D *m_apScene2D[MAX_RANKING];	// Object2Dのポインタ
-	//CUi *m_apUi[MAX_RANKING];				// UIのポインタ
 };
 
 #endif // !_RANKING_H_

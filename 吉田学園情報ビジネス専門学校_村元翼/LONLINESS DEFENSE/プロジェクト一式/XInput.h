@@ -44,7 +44,7 @@ public:
 	GAMEPAD	m_GamePad;					// ゲームパッドクラス
 
 private:
-	XINPUT_STATE m_laststate;
+	XINPUT_STATE m_laststate;			// 最後に保存したステート
 
 };
 #endif _XInput_H_

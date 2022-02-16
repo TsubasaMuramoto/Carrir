@@ -5,6 +5,9 @@
 #define _SCENE_H
 #include "main.h"
 
+//----------------------------------
+// ÉNÉâÉXêÈåæ
+//----------------------------------
 class CScene
 {
 public:
@@ -38,6 +41,9 @@ public:
 	virtual void Update(void) = 0;
 	virtual void Draw(void) = 0;
 
+	//-----------------------------
+	// Getter & Setter
+	//-----------------------------
 	void SetObjType(OBJTYPE objType)	{ m_ObjType = objType; }
 	void SetPos(D3DXVECTOR3 pos)		{ m_pos = pos; }
 	void SetScale(D3DXVECTOR3 Scale)	{ m_Scale = Scale; }

@@ -32,14 +32,16 @@ public:
 
 	static CPlayer *Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, CTexture::Type texture = CTexture::Player);
 
-	void Move(void);
-	void MovingLimit(D3DXVECTOR3& pos, D3DXVECTOR3 &scale, D3DXVECTOR3 &speed);
-	void Rotate(D3DXVECTOR3 pos, D3DXVECTOR3 scale, float Angle);
-	void Acceleration(D3DXVECTOR3& vec, D3DXVECTOR3 speed, float Maxspeed);
-	float RotateGamePad(CXInput *pGamePad);
-	float FeaturedMouse(D3DXVECTOR3 pos, POINT mousePoint);
+	void Move(void);																// プレイヤーの移動関数
+	void MovingLimit(D3DXVECTOR3& pos, D3DXVECTOR3 &scale, D3DXVECTOR3 &speed);		// 移動限界設定関数
+	void Rotate(D3DXVECTOR3 pos, D3DXVECTOR3 scale, float Angle);					// 回転関数
+	void Acceleration(D3DXVECTOR3& vec, D3DXVECTOR3 speed, float Maxspeed);			// 慣性関数
+	float RotateGamePad(CXInput *pGamePad);											// ゲームパッドでの回転関数
+	float FeaturedMouse(D3DXVECTOR3 pos, POINT mousePoint);							// マウス追従処理関数
 
-	// セッターとゲッター
+	//-------------------------
+	// Getter & Setter
+	//-------------------------
 	void SetPos(D3DXVECTOR3 pos);
 	D3DXVECTOR3 GetPos(void)			{ return m_pos; }
 	D3DXVECTOR3 GetScale(void)			{ return m_scale; }
@@ -60,8 +62,8 @@ private:
 	float				m_fShootInterval;	// 射撃間隔
 	POINT				m_Point;			// カーソル情報
 
-	const static D3DXVECTOR2 m_ScrollRange;
-	const static D3DXVECTOR2 m_ScrollRange2;
+	const static D3DXVECTOR2 m_ScrollRange;	// スクロールレンジ
+	const static D3DXVECTOR2 m_ScrollRange2;// スクロールレンジ
 };
 
 #endif // _PLAYER_H_

@@ -5,7 +5,9 @@
 #define _INPUT_H_
 #include "main.h"
 
-
+//---------------------
+// クラス宣言
+//---------------------
 class CInput
 {
 public:
@@ -16,10 +18,8 @@ public:
 	virtual void Update(void) = 0;
 
 protected:
-	static LPDIRECTINPUT8 m_pInput;//DirectInputオブジェクトのポインタ
-	LPDIRECTINPUTDEVICE8 m_pDevice;//入力デバイスへのポインタ
+	static LPDIRECTINPUT8 m_pInput;	// DirectInputオブジェクトのポインタ
+	LPDIRECTINPUTDEVICE8 m_pDevice;	// 入力デバイスへのポインタ
+
 };
-
-
-//プロトタイプ宣言
 #endif _INPUT_H_

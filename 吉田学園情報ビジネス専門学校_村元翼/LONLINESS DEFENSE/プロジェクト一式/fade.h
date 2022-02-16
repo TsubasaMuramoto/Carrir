@@ -6,7 +6,15 @@
 #include "texture.h"
 #include "manager.h"
 #include "scene2D.h"
+
+//-----------------------------------------------------
+// 前方宣言
+//-----------------------------------------------------
 class CBg;
+
+//-----------------------------------------------------
+// クラス宣言
+//-----------------------------------------------------
 class CFade : public CScene
 {
 public:
@@ -33,8 +41,8 @@ public:
 	static CFade *Create(CTexture::Type type,CManager::MODE modeNext);	// インスタンス生成処理
 
 private:
-	CTexture::Type				m_Type;
-	static CBg					*m_pBg;
+	CTexture::Type				m_Type;			// テクスチャタイプ
+	static CBg					*m_pBg;			// 背景クラス
 	static FADE					m_fade;			// フェードの状態
 	static CManager::MODE		m_modeNext;		// 次の画面（モード）
 	static float				m_colorAlpha;	// フェードの色

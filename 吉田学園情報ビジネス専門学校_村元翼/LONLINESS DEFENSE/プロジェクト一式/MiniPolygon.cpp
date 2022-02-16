@@ -59,6 +59,7 @@ void CMiniPolygon::Update(void)
 	{
 		CScene2D::Update();
 
+		// タイプ別更新処理
 		switch (m_type)
 		{
 		case MINIPOLYGON_PLAYER:
@@ -103,7 +104,7 @@ CMiniPolygon *CMiniPolygon::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, MINIPOLYG
 	//インスタンス生成
 	CMiniPolygon *pMiniPolygon = new CMiniPolygon(OBJTYPE_POLYGON);
 
-	if (pMiniPolygon != NULL)
+	if (pMiniPolygon != nullptr)
 	{
 		//						↓ミニマップの右上を始点に		↓スクロールした分の位置を2で割りposに足し、位置をミニポリゴンの大きさで割る
 		pMiniPolygon->m_pos = CPolygon::GetVtx1() + ((pos +(CGame::GetScrollPos() / 2)) / DIVISION_SIZE);
@@ -111,6 +112,7 @@ CMiniPolygon *CMiniPolygon::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, MINIPOLYG
 		pMiniPolygon->m_type = type;
 		pMiniPolygon->m_bUse = true;
 		
+		// タイプ別初期化処理
 		switch (pMiniPolygon->m_type)
 		{
 		case MINIPOLYGON_PLAYER:
@@ -125,7 +127,7 @@ CMiniPolygon *CMiniPolygon::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, MINIPOLYG
 			break;
 		}
 
-
+		// 初期化処理
 		pMiniPolygon->Init();
 	}
 
@@ -137,8 +139,10 @@ CMiniPolygon *CMiniPolygon::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, MINIPOLYG
 //=============================================================================
 void CMiniPolygon::Move(D3DXVECTOR3 speed)
 {
+	// 移動量が0以外の時
 	if (speed.x != 0.0f || speed.y != 0.0f)
 	{
+		// 座標更新
 		if (speed.x != 0.0f)
 		{
 			m_pos.x += (speed.x / DIVISION_SIZE);

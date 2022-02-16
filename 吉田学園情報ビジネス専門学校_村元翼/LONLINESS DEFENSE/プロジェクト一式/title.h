@@ -40,11 +40,11 @@ public:
 	void NextMode(bool bNextMode) { m_bNextMode = bNextMode; }
 
 private:
-	CScene2D			*m_pTitle[MAX_TITLE_POLYGON];
-	int					m_nSelectType;		// 選択したタイプ
-	int					m_nFrame;			// フレーム数
-	int					m_nMultiFrame;		// 
-	bool				m_bNextMode;		// 次のモードに行くための
+	CScene2D			*m_pTitle[MAX_TITLE_POLYGON];	// シーン2Dクラス
+	int					m_nSelectType;					// 選択したタイプ
+	int					m_nFrame;						// フレーム数
+	int					m_nMultiFrame;					// フレーム数に掛ける数
+	bool				m_bNextMode;					// 次のモードに行くための
 };
 
 

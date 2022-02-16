@@ -26,12 +26,17 @@ int CEnemy::m_nAll = 0;
 //=============================================================================
 CEnemy::CEnemy(OBJTYPE nPriority) : CScene2D(nPriority)
 {
+	// メンバ変数の初期化
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_Speed = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_nLife = 0;
+	m_nFrame = 0;
+	m_nPattern = 0;
 	m_bUse = false;
+
+	// 敵の数カウント
 	m_nAll++;
 }
 
@@ -98,12 +103,12 @@ void CEnemy::Update(void)
 {
 	if (m_bUse == true)
 	{
-		// ミニ敵の移動
+		// ミニマップの敵の移動
 		m_pMiniEnemy->Move(m_move);
 
 		CScene2D::Update();
 		CScene2D::SetPos(m_pos, m_scale);
-		CScene2D::SetTex((float)nPattern, 0.0f, 0.5f, 1.0f);
+		CScene2D::SetTex((float)m_nPattern, 0.0f, 0.5f, 1.0f);
 		m_pos = CScene::GetPos();
 
 		//----------------------------------------------------------------------
@@ -118,7 +123,8 @@ void CEnemy::Update(void)
 			// ターゲットに追従する処理
 			FeaturedTarget(&pScene->GetPos(), &m_pos);
 
-			pScene = pSceneNext;	// 次のシーンを現在のシーンにする
+			// 次のシーンを現在のシーンにする
+			pScene = pSceneNext;	
 		}
 
 		//----------------------------------------------------------------------
@@ -131,9 +137,9 @@ void CEnemy::Update(void)
 			// 次のシーンを取得
 			CScene *pSceneNext2 = CScene::GetSceneNext(pScene2);
 
-			// 当たり判定
 			if (pScene2 != NULL)
 			{
+				// 四角と四角の当たり判定
 				if (pCollision->SetCollision(this, pScene2) == true)
 				{
 					CEffect::Create(
@@ -143,11 +149,11 @@ void CEnemy::Update(void)
 						D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
 						0.0f, 0.0f, 0.0f,
 						CEffect::EFFECT_EXPLOSION,
-						CTexture::Explosion);		// 爆発のエフェクト生成
+						CTexture::Explosion);			// 爆発のエフェクト生成
 
-					CScore *pScore = CGame::GetScore();
-					pScore->AddScore(100);
-					Uninit();						// 敵の消滅
+					CScore *pScore = CGame::GetScore();	// スコア取得
+					pScore->AddScore(100);				// スコア加算
+					Uninit();							// 敵の消滅
 				}
 			}
 
@@ -164,17 +170,20 @@ void CEnemy::Update(void)
 
 	}
 
-	nFrame++;
+	// フレームカウント
+	m_nFrame++;
 
-	if (nFrame >= 30)
+	// 敵アニメーションを進める
+	if (m_nFrame >= 30)
 	{
-		nFrame = 0;
-		nPattern++;
+		m_nFrame = 0;
+		m_nPattern++;
 	}
 
-	if (nPattern >= 2)
+	// アニメーションを0に戻す
+	if (m_nPattern >= 2)
 	{
-		nPattern = 0;
+		m_nPattern = 0;
 	}
 }
 
@@ -203,7 +212,7 @@ CEnemy *CEnemy::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, CTexture::Type textur
 	// インスタンス生成
 	CEnemy *pEnemy = new CEnemy(OBJTYPE_ENEMY);
 
-	if (pEnemy != NULL)
+	if (pEnemy != nullptr)
 	{
 		// プレイヤー情報の取得
 		pEnemy->m_pos = pos;
@@ -219,19 +228,19 @@ CEnemy *CEnemy::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, CTexture::Type textur
 		// ミニマップの敵の生成
 		pEnemy->m_pMiniEnemy = CMiniPolygon::Create
 		(
-			D3DXVECTOR3
+			D3DXVECTOR3						// 位置
 			(
 				pEnemy->GetPos().x,
 				pEnemy->GetPos().y,
 				0.0f
 			),
-			D3DXVECTOR3
+			D3DXVECTOR3						// サイズ
 			(
 				pEnemy->GetScale().x,
 				pEnemy->GetScale().y,
 				0.0f
 			),
-			CMiniPolygon::MINIPOLYGON_ENEMY
+			CMiniPolygon::MINIPOLYGON_ENEMY	// ミニマップのポリゴンタイプ
 		);
 	}
 
@@ -256,18 +265,18 @@ void CEnemy::FeaturedTarget(D3DXVECTOR3 *targetPos, D3DXVECTOR3 *featuredPos)
 	float fLengthX = (targetPos->x - featuredPos->x);
 	float fLengthY = (targetPos->y - featuredPos->y);
 
-	// 角度を求める(XYを逆にして引数に入れると↑から0度になる)
-	//float fAngle = (float)-atan2(fLengthX, fLengthY);
-
-	// 斜めの距離
+	// 斜めの距離を求める
 	float fLengthTrue = sqrtf(fLengthX * fLengthX + fLengthY * fLengthY);
 
+	// 正規化
 	m_move.x = fLengthX / fLengthTrue;
 	m_move.y = fLengthY / fLengthTrue;
 
+	// 速度を掛ける
 	m_move.x *= m_Speed.x;
 	m_move.y *= m_Speed.y;
 
+	// 座標更新
 	featuredPos->x += m_move.x;
 	featuredPos->y += m_move.y;
 

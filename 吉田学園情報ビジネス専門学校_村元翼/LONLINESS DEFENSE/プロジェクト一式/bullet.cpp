@@ -29,11 +29,14 @@ int CBullet::m_nAll = 0;
 //=============================================================================
 CBullet::CBullet(OBJTYPE nPriority) : CScene2D(nPriority)
 {
+	// メンバ変数の初期化
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_nLifeSpan = 0;
 	m_fSpeed = 0;
 	m_bUse = false;
+
+	// 弾数のカウント
 	m_nAll++;
 }
 
@@ -121,13 +124,13 @@ void CBullet::Update(void)
 		CCollision *pCollision = new CCollision;
 		CScene *pScene = CScene::GetScene(CScene::OBJTYPE_ENEMY);
 
-		while (pScene != NULL)
+		while (pScene != nullptr)
 		{
 			CScene *pSceneNext = CScene::GetSceneNext(pScene);
 
-			// 当たり判定
-			if (pScene != NULL)
+			if (pScene != nullptr)
 			{
+				// 円と四角の当たり判定
 				if (pCollision->CircleCollision(this, pScene) == true)
 				{
 					CEffect::Create(
@@ -137,11 +140,11 @@ void CBullet::Update(void)
 						D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
 						0.0f, 0.0f, 0.0f,
 						CEffect::EFFECT_EXPLOSION,
-						CTexture::Explosion);		// 爆発のエフェクト生成
+						CTexture::Explosion);		// 爆発エフェクト生成
 
 					CScore *pScore;
-					pScore = CGame::GetScore();
-					pScore->AddScore(100);
+					pScore = CGame::GetScore();		// スコア取得
+					pScore->AddScore(100);			// スコア加算
 					Uninit();						// 弾の消滅
 					pScene->Uninit();				// 敵の消滅
 				}
@@ -151,7 +154,7 @@ void CBullet::Update(void)
 			pScene = pSceneNext;
 		}
 
-		if (pCollision != NULL)
+		if (pCollision != nullptr)
 		{
 			delete pCollision;
 			pCollision = nullptr;
@@ -193,41 +196,42 @@ CBullet *CBullet::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,float angle, CTextur
 	pBullet->m_fSpeed = 15.0f;						// 速度
 	pBullet->m_bUse = true;							// 弾の使用状況
 
-	if (pBullet != NULL)
+	if (pBullet != nullptr)
 	{
 		pBullet->Init();	// 初期化処理
-	}
 
 	// エフェクトの生成
-	pBullet->m_pEffect = CEffect::Create
-	(
-		pBullet->m_pos,												// 位置
-		D3DXVECTOR3(pBullet->m_fSpeed, pBullet->m_fSpeed, 0.0f),	// 速度
-		D3DXVECTOR3(60.0f, 60.0f, 0.0f),							// 大きさ
-		D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f),							// カラー
-		0.1f,														// 縮小速度
-		0.01f,														// 透明化速度
-		pBullet->m_fAngle,											// 角度
-		CEffect::EFFECT_BULLET,										// エフェクトタイプ
-		CTexture::Effect											// テクスチャタイプ
-	);
+		pBullet->m_pEffect = CEffect::Create
+		(
+			pBullet->m_pos,												// 位置
+			D3DXVECTOR3(pBullet->m_fSpeed, pBullet->m_fSpeed, 0.0f),	// 速度
+			D3DXVECTOR3(60.0f, 60.0f, 0.0f),							// 大きさ
+			D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f),							// カラー
+			0.1f,														// 縮小速度
+			0.01f,														// 透明化速度
+			pBullet->m_fAngle,											// 角度
+			CEffect::EFFECT_BULLET,										// エフェクトタイプ
+			CTexture::Effect											// テクスチャタイプ
+		);
 
-	pBullet->m_pMiniBullet = CMiniPolygon::Create
-	(
-		D3DXVECTOR3
+		// ミニマップの弾の生成
+		pBullet->m_pMiniBullet = CMiniPolygon::Create
 		(
-			pBullet->GetPos().x,
-			pBullet->GetPos().y,
-			0.0f											  
-		),
-		D3DXVECTOR3
-		(
-			pBullet->GetScale().x,
-			pBullet->GetScale().y,
-			0.0f
-		),
-		CMiniPolygon::MINIPOLYGON_BULLET
-	);
+			D3DXVECTOR3							// 位置
+			(
+				pBullet->GetPos().x,
+				pBullet->GetPos().y,
+				0.0f
+			),
+			D3DXVECTOR3							// サイズ
+			(
+				pBullet->GetScale().x,
+				pBullet->GetScale().y,
+				0.0f
+			),
+			CMiniPolygon::MINIPOLYGON_BULLET	// ミニマップのポリゴンのタイプ
+		);
+	}
 
 	return pBullet;
 }

@@ -1,6 +1,5 @@
 //---------------------------------------------------------------
 // タイムの作成
-//
 //---------------------------------------------------------------
 #ifndef _TIME_H_
 #define _TIME_H_
@@ -10,7 +9,7 @@
 //---------------------------------------------------------------
 // マクロ定義
 //---------------------------------------------------------------
-#define MAX_TIME (3)	//描画するポリゴン枚数
+#define MAX_TIME (3)	// 描画するポリゴン枚数
 #define TIME (60)		// 制限時間
 
 //---------------------------------------------------------------
@@ -27,13 +26,13 @@ public:
 	CTime(OBJTYPE nPriority = OBJTYPE_NUMBER);
 	~CTime();
 
-	static CTime *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size);	// 生成
+	static CTime *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size);// 生成
 	HRESULT Init(D3DXVECTOR3 pos,D3DXVECTOR3 size);			// 初期化
-	HRESULT Init();										// 初期化
-	void Uninit(void);									// 終了
-	void Update(void);									// 更新
-	void Draw(void);									// 描画
-	void SetTime(void);									//描画されているテクスチャの設定
+	HRESULT Init();											// 初期化
+	void Uninit(void);										// 終了
+	void Update(void);										// 更新
+	void Draw(void);										// 描画
+	void SetTime(void);										// 描画されているテクスチャの設定
 
 private:
 	int		m_nTime;									// 現在の時間

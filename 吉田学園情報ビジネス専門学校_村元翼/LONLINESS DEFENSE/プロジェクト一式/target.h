@@ -8,9 +8,15 @@
 #define _TARGET_H_
 #include "scene2D.h"
 
+//=============================================================================
 // 前方宣言
+//=============================================================================
 class CTexture;
 class CMiniPolygon;
+
+//=============================================================================
+// クラス定義
+//=============================================================================
 class CTarget : public CScene2D
 {
 public:
@@ -22,6 +28,10 @@ public:
 	void Update(void);
 	void Draw(void);
 	static CTarget *Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, CTexture::Type texture = CTexture::Target);
+
+	//--------------------------
+	// Getter
+	//--------------------------
 	D3DXVECTOR3 GetPos(void) { return m_pos; }
 	D3DXVECTOR3 GetScale(void) { return m_scale; }
 

@@ -1,5 +1,5 @@
 //----------------------------------
-//ポリゴンの処理
+// ポリゴンの処理
 //----------------------------------
 #ifndef _SCENE2D_H
 #define _SCENE2D_H
@@ -8,7 +8,7 @@
 #include "texture.h"
 
 //----------------------------------
-//マクロ定義
+// マクロ定義
 //----------------------------------
 #define FVF_VERTEX_2D (D3DFVF_XYZRHW|D3DFVF_DIFFUSE|D3DFVF_TEX1)
 
@@ -24,7 +24,7 @@ typedef struct
 } VERTEX_2D;
 
 //------------------------------------------------------------------------------
-//クラスの定義
+// クラスの定義
 //------------------------------------------------------------------------------
 class CScene2D : public CScene
 {
@@ -51,16 +51,16 @@ public:
 	void SetTex(float nPatternX, float nPatternY, float fSizeX,float fSizeY);					// テクスチャの設定
 
 	void SetCol(D3DXCOLOR col);																	// カラーの設定
-	static D3DXVECTOR3 Move(D3DXVECTOR3 *pPos, float angle, float speed);
-	void BindTexture(CTexture::Type type);
+	static D3DXVECTOR3 Move(D3DXVECTOR3 *pPos, float angle, float speed);						// 移動関数
+	void BindTexture(CTexture::Type type);														// テクスチャ取得関数
 
 private:
+	bool m_bUse;											// 使用状況
 
 protected:
 
-	LPDIRECT3DTEXTURE9		m_pTexture = NULL;				//テクスチャへのポインタ
-	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff = NULL;				//頂点バッファへのポインタ
-	bool m_bUse;
+	LPDIRECT3DTEXTURE9		m_pTexture = NULL;				// テクスチャへのポインタ
+	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff = NULL;				// 頂点バッファへのポインタ
 
 };
 

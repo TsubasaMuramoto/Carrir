@@ -1,6 +1,5 @@
 //--------------------------------------
 // PAUSEの処理
-// Author: 
 //--------------------------------------
 #ifndef _PAUSE_H
 #define _PAUSE_H
@@ -47,7 +46,7 @@ public:
 	static CPause *Create(D3DXVECTOR3 pos);			// インスタンス生成処理
 
 private:
-	//void FadeInOut(int nFade);						// ポーズのフェードに使う関数？
+	//void FadeInOut(int nFade);					// ポーズのフェードに使う関数？
 	//void SetPAUSE(int nType);						// PAUSEに使うポリゴンの生成？
 	D3DXVECTOR3		m_pos;							// 位置
 	D3DXVECTOR3		m_Speed;						// 速度

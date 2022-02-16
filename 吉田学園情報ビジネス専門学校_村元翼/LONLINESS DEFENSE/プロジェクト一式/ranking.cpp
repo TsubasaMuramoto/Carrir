@@ -1,6 +1,5 @@
 //================================================
 //ランキング処理
-//Author:加藤瑞葵
 //================================================
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
@@ -232,14 +231,6 @@ void CRanking::Update(void)
 			if (posScore.x <= SCREEN_WIDTH / 2.0f)
 			{
 				posScore.x = SCREEN_WIDTH / 2.0f;
-
-				////サウンド取得処理
-				//CSound *pSound;
-				//pSound = CManager::GetSound();
-
-				//pSound->Play(CSound::SOUND_LABEL_RANKING_SE);
-				//pSound->ControllVoice(CSound::SOUND_LABEL_RANKING_SE, 1.5f);
-
 			}
 			//位置設定
 			m_apScore[nCntRanking]->SetScorePos(posScore);

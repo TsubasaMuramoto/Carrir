@@ -10,7 +10,7 @@
 //-----------------------------------------------------
 // マクロ定義
 //-----------------------------------------------------
-#define MAX_GAUGE_WIDTH (400.0f)
+#define MAX_GAUGE_WIDTH (400.0f)	// ゲージ幅
 
 //-----------------------------------------------------
 // クラスの生成
@@ -34,8 +34,7 @@ private:
 	static D3DXVECTOR3	m_Scale;					// ゲージの大きさ
 	float				m_fScaleSpeed;				// ゲージを増やしていく
 	bool				m_bNextMode;				// 二重押し防止変数
-	bool				m_bOneTimeOnlyPlay;			// 
 
 };
 
-#endif // !_TIME_H_*/#pragma once
+#endif // !_TIME_H_

@@ -31,8 +31,4 @@ public:
 	bool SetCollision(CScene *pHit1,CScene *pHit2);
 	bool CircleCollision(CScene *pCircle, CScene *pSquare);
 
-private:
-
 };
-
-// “–‚½‚è”»’è‚É•K—v‚È‚à‚Ì

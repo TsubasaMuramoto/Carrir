@@ -11,7 +11,7 @@
 //=============================================================================
 // マクロ定義
 //=============================================================================
-#define DIVISION_SIZE (8)
+#define DIVISION_SIZE (8)		// 分割数
 
 //=============================================================================
 // 前方宣言
@@ -25,7 +25,7 @@ class CMiniPolygon : public CScene2D
 {
 public:
 	//==========================================================
-	// 列挙型
+	// ミニポリゴンタイプの構造体
 	//==========================================================
 	typedef enum
 	{
@@ -53,11 +53,11 @@ public:
 	D3DXVECTOR3 GetScale(void)  { return m_scale; }
 
 private:
-	D3DXVECTOR3			m_pos;
-	D3DXVECTOR3			m_scale;
-	MINIPOLYGON_TYPE	m_type;
-	CTexture::Type		m_Tex;
-	bool				m_bUse;
+	D3DXVECTOR3			m_pos;		// 位置
+	D3DXVECTOR3			m_scale;	// サイズ
+	MINIPOLYGON_TYPE	m_type;		// ミニポリゴンタイプ
+	CTexture::Type		m_Tex;		// テクスチャタイプ
+	bool				m_bUse;		// 使用状況
 };
 
 #endif // _MINIPOLYGON_H_

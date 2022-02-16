@@ -18,7 +18,6 @@ D3DXVECTOR3 CGauge::m_Scale = {};
 CGauge::CGauge(OBJTYPE nPriority) : CScene2D(nPriority)
 {
 	m_bNextMode = false;
-	m_bOneTimeOnlyPlay = false;
 	m_fScaleSpeed = 0.1f;
 }
 

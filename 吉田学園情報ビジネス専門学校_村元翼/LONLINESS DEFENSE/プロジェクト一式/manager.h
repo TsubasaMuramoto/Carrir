@@ -44,6 +44,9 @@ public:
 	void Update(void);
 	void Draw(void);
 
+	//----------------------------
+	// Getter & Setter
+	//----------------------------
 	static CRenderer *GetRenderer(void)		{ return m_pRenderer; }		// レンダラーの取得
 	static CTexture *GetTexture(void)		{ return m_pTexture; }		// テクスチャの取得
 	static CInputkeyboard *GetKeyboard()	{ return m_pKeyboard; }		// キーボードの取得
@@ -71,12 +74,10 @@ private:
 	static MODE				m_Mode;				// 現在のモード
 	static CPause			*m_pPause;			// ポーズクラス
 	static CMouse			*m_pMouse;			// マウスクラス
-	static CPlayData		*m_pPlayData;		//プレイデータクラスのポインタ
+	static CPlayData		*m_pPlayData;		//  プレイデータクラス
 
 	static bool				m_bGamepadSwitch;	// ゲームパッド入力のオンオフ
 	static bool				m_bStop;			// ストップするか
 	static bool				m_bPause;			// ポーズにするか
-
-
 };
 #endif //_MANAGER_H

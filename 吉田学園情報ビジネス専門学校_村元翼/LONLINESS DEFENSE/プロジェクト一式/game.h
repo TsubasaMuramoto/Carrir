@@ -9,9 +9,9 @@
 //---------------------------------------
 // マクロ定義
 //---------------------------------------
-#define GAUGE_POS (D3DXVECTOR3(50.0f,50.0f,0.0f))
-#define TIME_POS (D3DXVECTOR3(980.0f, 680.0f, 0.0f))
-#define POP_TIMING (60)
+#define GAUGE_POS (D3DXVECTOR3(50.0f,50.0f,0.0f))	// ゲージ位置
+#define TIME_POS (D3DXVECTOR3(980.0f, 680.0f, 0.0f))// タイム位置
+#define POP_TIMING (60)								// 出現のタイミング
 
 //---------------------------------------
 // 前方宣言
@@ -71,6 +71,9 @@ public:
 	static void							SetScroll(const char* Direction,D3DXVECTOR3 speed);
 
 private:
+	//-----------------------------
+	// Gameクラスで使用するクラス
+	//-----------------------------
 	static CScene2D						*m_pGaugeFrame;
 	static CScore						*m_pScore;
 	static CBg							*m_pBg;
@@ -89,6 +92,4 @@ private:
 	bool				m_bNextMode;		// 二重押し防止変数
 
 };
-
-
 #endif //_RESULT_H
