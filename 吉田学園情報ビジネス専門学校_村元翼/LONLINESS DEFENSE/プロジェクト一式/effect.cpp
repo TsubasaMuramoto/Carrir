@@ -7,7 +7,6 @@
 #include "manager.h"
 #include "renderer.h"
 #include "bullet.h"
-#include <random>
 
 //--------------------------------------------------
 // コンストラクタ
@@ -37,21 +36,25 @@ CEffect *CEffect::Create(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXVECTOR3 size, D3
 {//	位置, 移動量, サイズ,色, 小さくなるスピード
 
 	// インスタンス生成
-	CEffect *pEffect = new CEffect(OBJTYPE_EFFECT);
-
-	if (pEffect != NULL)
+	CEffect *pEffect = nullptr;
+	if (pEffect == nullptr)
 	{
-		// 引数代入
-		pEffect->m_pos = pos;
-		pEffect->m_move = move;
-		pEffect->m_size = size;
-		pEffect->m_col = col;
-		pEffect->m_fScaleSpeed = ScaleSpeed;
-		pEffect->m_fTransparentSpeed = TransparentSpeed;
-		pEffect->m_fAngle = angle;
-		pEffect->m_EffectType = effectType;
-		pEffect->m_bUse = true;
-		pEffect->Init(type);								// 画像読み込み
+		pEffect = new CEffect(OBJTYPE_EFFECT);
+
+		if (pEffect != nullptr)
+		{
+			// 引数代入
+			pEffect->m_pos = pos;
+			pEffect->m_move = move;
+			pEffect->m_size = size;
+			pEffect->m_col = col;
+			pEffect->m_fScaleSpeed = ScaleSpeed;
+			pEffect->m_fTransparentSpeed = TransparentSpeed;
+			pEffect->m_fAngle = angle;
+			pEffect->m_EffectType = effectType;
+			pEffect->m_bUse = true;
+			pEffect->Init(type);								// 画像読み込み
+		}
 	}
 
 	return pEffect;
@@ -184,6 +187,7 @@ void CEffect::ProcessByType(EFFECT_TYPE type)
 //-----------------------------------------------------
 void CEffect::RandomInjection(void)
 {
+	// 噴射エフェクトの角度幅の最小値と次第値
 	float minRange = D3DXToRadian(-90.0f);
 	float maxRange = D3DXToRadian(90.0f);
 
@@ -194,7 +198,7 @@ void CEffect::RandomInjection(void)
 	m_fAngle = Dist(mt);
 
 #if _DEBUG_
-	float fDegree = D3DXToDegree(m_fAngle);	// デバッグ時に角度を確認する
+	float fDegree = D3DXToDegree(m_fAngle);										// デバッグ時に角度を確認するための処理
 #endif
 
 	if (m_move.x != 0.0f)		// 左右

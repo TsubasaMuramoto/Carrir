@@ -70,7 +70,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		}
 	}
 
-	// レンダラーの生成の初期化
+	// レンダラーの生成
 	if (m_pRenderer == nullptr)
 	{
 		m_pRenderer = new CRenderer;
@@ -261,8 +261,10 @@ void CManager::Update(void)
 				m_bPause = m_bPause ? false : true;		// ポーズを切り替える
 			}
 
+			// ストップ状態
 			if (m_bStop == true)
 			{
+				// コントローラーのバイブレーションと止める
 				m_pXInput->m_GamePad.m_vibration.wLeftMotorSpeed = 0;
 				m_pXInput->m_GamePad.m_vibration.wRightMotorSpeed = 0;
 				XInputSetState(0, &m_pXInput->m_GamePad.m_vibration);
@@ -353,7 +355,6 @@ void CManager::SetMode(MODE mode)
 	case MODE_TITLE:		//タイトル画面
 		if (m_pTitle != nullptr)
 		{
-			//m_pSound->StopSound(m_pSound->SOUND_LABEL_BGM_TITLE);
 			m_pTitle->Uninit();
 			delete m_pTitle;
 			m_pTitle = nullptr;
@@ -372,7 +373,6 @@ void CManager::SetMode(MODE mode)
 	case MODE_GAME:			// ゲーム画面
 		if (m_pGame != nullptr)
 		{
-			//m_pSound->StopSound(m_pSound->SOUND_LABEL_BGM_GAME);
 			m_pGame->Uninit();
 			delete m_pGame;
 			m_pGame = nullptr;
@@ -389,7 +389,6 @@ void CManager::SetMode(MODE mode)
 	case MODE_RESULT:		//リザルト画面
 		if (m_pResult != nullptr)
 		{
-			//m_pSound->StopSound(m_pSound->SOUND_LABEL_BGM_RESULT);
 			m_pResult->Uninit();
 			delete m_pResult;
 			m_pResult = nullptr;
@@ -400,7 +399,7 @@ void CManager::SetMode(MODE mode)
 	//現在のモードで生成したオブジェクトの削除
 	CScene::ReleaseAll();
 
-	//次に移行するモードの生成
+	// 次に移行するモードの生成
 	switch (mode)
 	{
 	case MODE_TITLE:		//タイトル画面
@@ -408,7 +407,6 @@ void CManager::SetMode(MODE mode)
 		{
 			m_pTitle = new CTitle;
 			m_pTitle->Init();
-			//m_pSound->PlaySound(m_pSound->SOUND_LABEL_BGM_TITLE);	// タイトルサウンド
 		}
 		break;
 
@@ -428,7 +426,6 @@ void CManager::SetMode(MODE mode)
 
 			m_pGame = new CGame;
 			m_pGame->Init();
-			//m_pSound->PlaySound(m_pSound->SOUND_LABEL_BGM_GAME);	// タイトルサウンド
 		}
 		break;
 	case MODE_RESULT:		//リザルト画面
@@ -436,7 +433,6 @@ void CManager::SetMode(MODE mode)
 		{
 			m_pResult = new CResult;
 			m_pResult->Init();
-			//m_pSound->PlaySound(m_pSound->SOUND_LABEL_BGM_RESULT);	// リザルトサウンド
 		}
 		break;
 	}

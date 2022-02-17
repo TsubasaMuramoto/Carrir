@@ -53,6 +53,7 @@ CFade *CFade::Create(CTexture::Type type, CManager::MODE modeNext)
 //--------------------------------------------
 HRESULT CFade::Init(void)
 {
+	// 背景生成
 	m_pBg = CBg::Create(false,CFade::m_Type,CScene::OBJTYPE_FADE);
 
 	return S_OK;
@@ -67,7 +68,7 @@ void CFade::Uninit(void)
 }
 
 //--------------------------------------------
-//フェードの更新処理
+// 更新
 //--------------------------------------------
 void CFade::Update(void)
 {
@@ -75,7 +76,7 @@ void CFade::Update(void)
 	{
 		m_pBg->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, m_colorAlpha));
 
-		//フェード画面を消す
+		// フェード画面を消す
 		if (m_fade == FADE_IN)
 		{
 			m_colorAlpha -= 0.05f;
@@ -86,7 +87,7 @@ void CFade::Update(void)
 			}
 
 		}
-		//フェード画面を出す
+		// フェード画面を出す
 		else if (m_fade == FADE_OUT)
 		{
 			m_colorAlpha += 0.01f;
@@ -96,7 +97,7 @@ void CFade::Update(void)
 				m_colorAlpha = 1.0f;
 				m_fade = FADE_IN;
 
-				//モードの設定
+				// モードの設定
 				CManager::SetMode(m_modeNext);
 			}
 		}
@@ -112,7 +113,7 @@ void CFade::Draw(void)
 }
 
 //--------------------------------------------
-//フェードの設定処理
+// フェードの設定処理
 //--------------------------------------------
 void CFade::SetFade(CManager::MODE modeNext)
 {
@@ -122,7 +123,7 @@ void CFade::SetFade(CManager::MODE modeNext)
 }
 
 //--------------------------------------------
-//フェードの取得処理
+// フェードの取得処理
 //--------------------------------------------
 CFade::FADE CFade::GetFade(void)
 {

@@ -58,12 +58,10 @@ public:
 	static CTarget						*GetTarget(void)				{ return m_pTarget; }
 	static CPlayer						*GetPlayer(void)				{ return m_pPlayer; }
 	static CScore						*GetScore(void)					{ return m_pScore; }
-	static std::vector<CEnemy>			*GetEnemy(void)					{ return m_vpEnemy; }
 	static CBg							*GetBg(void)					{ return m_pBg; }
 	static CGauge						*GetGauge(void)					{ return m_pGauge; }
 	static CPolygon						*GetMiniMap(void)				{ return m_pMiniMap; }
 	static CMiniPolygon					*GetMiniPolygon(void)			{ return m_pMiniPlayer; }
-	static std::vector<CMiniPolygon>	*GetMiniEnemy(void)				{ return m_vpMiniEnemy; }
 	static D3DXVECTOR3					GetScroll(void)					{ return m_ScrollSpeed; }
 	static D3DXVECTOR3					GetScrollPos(void)				{ return m_ScrollPos; }
 	static int							GetTimer(void)					{ return m_nSpawnTimer; }
@@ -80,16 +78,13 @@ private:
 	static CPlayer						*m_pPlayer;
 	static CTime						*m_pTime;
 	static CPolygon						*m_pMiniMap;
-	static std::vector<CEnemy>			*m_vpEnemy;
 	static CTarget						*m_pTarget;
 	static CGauge						*m_pGauge;
 	static CMiniPolygon					*m_pMiniPlayer;
-	static std::vector<CMiniPolygon>	*m_vpMiniEnemy;
 
 	static D3DXVECTOR3	m_ScrollSpeed;		// スクロールスピード
 	static D3DXVECTOR3	m_ScrollPos;		// スクロール位置
 	static int			m_nSpawnTimer;		// 敵のスポーン間隔
 	bool				m_bNextMode;		// 二重押し防止変数
-
 };
 #endif //_RESULT_H

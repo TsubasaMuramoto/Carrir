@@ -1,8 +1,6 @@
 //=============================================================================
-//
 // 弾
 // Author : 村元翼
-//
 //=============================================================================
 #include "target.h"
 #include "collision.h"
@@ -17,6 +15,7 @@
 //=============================================================================
 CTarget::CTarget(OBJTYPE nPriority) : CScene2D(nPriority)
 {
+	// メンバ変数の初期化
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_scale = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_nLife = 0;
@@ -29,6 +28,7 @@ CTarget::CTarget(OBJTYPE nPriority) : CScene2D(nPriority)
 //=============================================================================
 CTarget::~CTarget()
 {
+	// オブジェクト終了
 	if (m_pMiniTarget != nullptr)
 	{
 		m_pMiniTarget->Uninit();
@@ -73,12 +73,13 @@ void CTarget::Update(void)
 	CCollision *pCollision = new CCollision;
 	CScene *pScene = CScene::GetScene(CScene::OBJTYPE_ENEMY);
 
-	while (pScene != NULL)
+	while (pScene != nullptr)
 	{
+		// 現在の次のシーン
 		CScene *pSceneNext = CScene::GetSceneNext(pScene);
 
 		// 当たり判定
-		if (pScene != NULL)
+		if (pScene != nullptr)
 		{
 			if (m_nInvincibleTime <= 0)
 			{
@@ -103,13 +104,13 @@ void CTarget::Update(void)
 							CEffect::EFFECT_EXPLOSION,
 							CTexture::Explosion);								// 爆発のエフェクト生成
 
-						CGauge::SetGauge(-30.0f);								// 体力ゲージを減らす
+						CGauge::SetGauge(DECREASE_GAUGE);						// 体力ゲージを減らす
 						CScene2D::SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));	// 透明にする
 						m_nLife--;												// 体力を減らす
 					}
 
-					pScene->Uninit();
-					m_nInvincibleTime = 180;
+					pScene->Uninit();											// 敵の消滅
+					m_nInvincibleTime = INVINCIBLE_TIME;						// 透明化タイムの初期化
 				}
 			}
 
@@ -123,10 +124,10 @@ void CTarget::Update(void)
 		pScene = pSceneNext;
 	}
 
-	if (pCollision != NULL)
+	if (pCollision != nullptr)
 	{
 		delete pCollision;
-		pCollision = NULL;
+		pCollision = nullptr;
 	}
 
 }
@@ -167,21 +168,21 @@ CTarget *CTarget::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, CTexture::Type text
 		pTarget->m_bUse = true;							// 弾の使用状況
 		pTarget->Init();								// 初期化処理
 
-		pTarget->m_pMiniTarget = CMiniPolygon::Create
+		pTarget->m_pMiniTarget = CMiniPolygon::Create	// ミニマップのターゲットの生成
 		(
-			D3DXVECTOR3
+			D3DXVECTOR3							// 位置
 			(
 				pTarget->GetPos().x,
 				pTarget->GetPos().y,
 				0.0f
 			),
-			D3DXVECTOR3
+			D3DXVECTOR3							// サイズ
 			(
 				pTarget->GetScale().x,
 				pTarget->GetScale().y,
 				0.0f
 			),
-			CMiniPolygon::MINIPOLYGON_TARGET
+			CMiniPolygon::MINIPOLYGON_TARGET	// タイプ
 		);
 	}
 

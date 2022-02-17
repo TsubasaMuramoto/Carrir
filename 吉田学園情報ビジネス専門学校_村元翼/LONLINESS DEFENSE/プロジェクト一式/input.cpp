@@ -1,23 +1,19 @@
 //---------------------
-//入力処理
+// 入力処理
 //---------------------
 #include "input.h"
 
 //-----------------------------------
-// マクロ定義
+// 静的メンバ変数の初期化
 //-----------------------------------
-
-//-----------------------------------
-//グローバル変数
-//-----------------------------------
-LPDIRECTINPUT8 CInput::m_pInput = NULL;//DirectInputオブジェクトのポインタ
+LPDIRECTINPUT8 CInput::m_pInput = nullptr;	// DirectInputオブジェクトのポインタ
 
 //----------------------------------------
 //コンストラクタ
 //----------------------------------------
 CInput::CInput()
 {
-	m_pDevice = NULL;
+	m_pDevice = nullptr;
 }
 //----------------------------------------
 //デストラクタ
@@ -43,14 +39,15 @@ HRESULT CInput::Init(HINSTANCE hInstance, HWND hWnd)
 //----------------------------------------
 void CInput::Uninit(void)
 {
-	//入力デバイスの開放
+	// 入力デバイスの開放
 	if (m_pDevice != NULL)
 	{
 		m_pDevice->Unacquire();
 		m_pDevice->Release();
 		m_pDevice = NULL;
 	}
-	//DirectInputオブジェクトの開放
+
+	// DirectInputオブジェクトの開放
 	if (m_pInput != NULL)
 	{
 		m_pInput->Release();

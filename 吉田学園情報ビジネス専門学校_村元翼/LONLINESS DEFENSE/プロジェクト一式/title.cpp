@@ -9,20 +9,21 @@
 #include "fade.h"
 #include "polygon.h"
 #include "XInput.h"
-//#include "sound.h"
 
 //--------------------------------------------
-//コンストラクタ
+// コンストラクタ
 //--------------------------------------------
 CTitle::CTitle()
 {
+	// メンバ変数の初期化
 	memset(m_pTitle, 0, sizeof(m_pTitle));
 	m_bNextMode = false;
 	m_nFrame = 0;
 	m_nMultiFrame = 1;
 }
+
 //--------------------------------------------
-//デストラクタ
+// デストラクタ
 //--------------------------------------------
 CTitle::~CTitle()
 {
@@ -45,6 +46,7 @@ HRESULT CTitle::Init(void)
 
 	return S_OK;
 }
+
 //--------------------------------------------
 //終了
 //--------------------------------------------
@@ -59,9 +61,8 @@ void CTitle::Uninit(void)
 			m_pTitle[nCnt] = nullptr;
 		}
 	}
-
-	//CManager::GetSound()->StopSound(CSound::SOUND_LABEL_BGM_TITLE);
 }
+
 //--------------------------------------------
 //更新
 //--------------------------------------------
@@ -89,11 +90,12 @@ void CTitle::Update(void)
 	// ENTERを押す
 	if (pGamePad->GetButtonTrigger(XINPUT_GAMEPAD_START) || pKey->GetTrigger(DIK_RETURN) == true && m_bNextMode == false)
 	{
-		m_nMultiFrame = 5;
+		m_nMultiFrame = BLINK_SPEED;
 		CFade::SetFade(CManager::MODE_TUTORIAL);		// ゲームモードへ
 		m_bNextMode = true;								// ENTER連打防止
 	}
 }
+
 //--------------------------------------------
 //描画
 //--------------------------------------------

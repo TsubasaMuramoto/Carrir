@@ -25,7 +25,7 @@ CScene2D::~CScene2D()
 }
 
 //---------------------------------------------------------------
-//インスタンス生成処理
+// インスタンス生成処理
 //---------------------------------------------------------------
 CScene2D *CScene2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, CTexture::Type texture,CScene::OBJTYPE objtype)
 {

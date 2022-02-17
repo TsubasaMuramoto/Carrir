@@ -21,6 +21,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 #ifdef _DEBUG
 int						g_nCountFPS;			// FPSカウンタ
 #endif
+
 //=============================================================================
 // メイン関数
 //=============================================================================
@@ -191,10 +192,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 //FPSカウンター変数の取得処理
 //=============================================================================
 #ifdef _DEBUG
-
 int GetFps(void)
 {
 	return g_nCountFPS;
 }
-
 #endif

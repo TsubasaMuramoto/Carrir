@@ -40,16 +40,25 @@ void CXInput::UpdateGamepad(void)
 	}
 }
 
+//-----------------------------------------------------------------------------
+// ボタンのトリガー情報取得
+//-----------------------------------------------------------------------------
 bool CXInput::GetButtonTrigger(int nButton)
 {
 	return (m_GamePad.m_stateLast.Gamepad.wButtons & nButton) == false && (m_GamePad.m_state.Gamepad.wButtons & nButton) ? true : false;
 }
 
+//-----------------------------------------------------------------------------
+// ボタンのプレス情報取得
+//-----------------------------------------------------------------------------
 bool CXInput::GetGamepadPress(int nButton)
 {
 	return (m_GamePad.m_state.Gamepad.wButtons & nButton);
 }
 
+//-----------------------------------------------------------------------------
+// XInputの取得
+//-----------------------------------------------------------------------------
 CXInput::GAMEPAD *CXInput::GetGamePad(void)
 {
 	return &m_GamePad;

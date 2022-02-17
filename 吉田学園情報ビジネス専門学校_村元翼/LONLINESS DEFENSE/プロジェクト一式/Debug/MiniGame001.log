@@ -1,38 +1,15 @@
 ﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(392,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (MiniGame001.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  XInput.cpp
-c:\users\student\desktop\separatedgit\carrir\吉田学園情報ビジネス専門学校_村元翼\lonliness defense\プロジェクト一式\xinput.cpp(50): warning C4800: 'int': ブール値を 'true' または 'false' に強制的に設定します (警告の処理)
   Tutorial.cpp
-  title.cpp
-  time.cpp
-  texture.cpp
-  target.cpp
-  score.cpp
-  scene2D.cpp
-  scene.cpp
-  result.cpp
-  renderer.cpp
-  ranking.cpp
-  polygon.cpp
-  play_data.cpp
-  player.cpp
-  pause.cpp
-  number.cpp
-  mouse.cpp
-  MiniPolygon.cpp
-  manager.cpp
   コードを生成中...
   コンパイル中...
-  main.cpp
-  keyboard.cpp
-  input.cpp
-  gauge.cpp
+  title.cpp
+  result.cpp
+  player.cpp
+  pause.cpp
+  manager.cpp
   game.cpp
-  fade.cpp
-  enemy.cpp
-  effect.cpp
-  collision.cpp
-  bullet.cpp
-  bg.cpp
+  XInput.cpp
+c:\users\student\desktop\separatedgit\carrir\吉田学園情報ビジネス専門学校_村元翼\lonliness defense\プロジェクト一式\xinput.cpp(56): warning C4800: 'int': ブール値を 'true' または 'false' に強制的に設定します (警告の処理)
   コードを生成中...
   MiniGame001.vcxproj -> C:\Users\student\Desktop\SeparatedGit\Carrir\吉田学園情報ビジネス専門学校_村元翼\LONLINESS DEFENSE\プロジェクト一式\Debug\Lonliness_Defense.exe
   MiniGame001.vcxproj -> C:\Users\student\Desktop\SeparatedGit\Carrir\吉田学園情報ビジネス専門学校_村元翼\LONLINESS DEFENSE\プロジェクト一式\Debug\Lonliness_Defense.pdb (Full PDB)

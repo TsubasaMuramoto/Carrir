@@ -17,8 +17,8 @@ D3DXVECTOR3 CGauge::m_Scale = {};
 //============================================================
 CGauge::CGauge(OBJTYPE nPriority) : CScene2D(nPriority)
 {
+	// メンバ変数の初期化
 	m_bNextMode = false;
-	m_fScaleSpeed = 0.1f;
 }
 
 //============================================================
@@ -80,7 +80,6 @@ void CGauge::Update()
 {
 	CScene2D::Update();
 	CScene2D::SetScalePos(m_pos, m_Scale);
-	//m_Scale.x += m_fScaleSpeed;//ゲージの上昇
 
 	// ゲージの振り切り防止
 	if (m_Scale.x <= 0)

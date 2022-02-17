@@ -105,17 +105,22 @@ void CPolygon::Draw(void)
 //=============================================================================
 CPolygon *CPolygon::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, CTexture::Type texture)
 {
-	//インスタンス生成
-	CPolygon *pPolygon = new CPolygon(OBJTYPE_POLYGON);
+	// インスタンス生成
+	CPolygon *pPolygon = nullptr;
 
-	pPolygon->m_pos = pos;
-	pPolygon->m_scale = scale;
-	pPolygon->m_Tex = texture;
-
-	if (pPolygon != NULL)
+	if (pPolygon == nullptr)
 	{
-		pPolygon->Init();
-	}
+		//	動的メモリ確保
+		pPolygon = new CPolygon(OBJTYPE_POLYGON);
 
+		if (pPolygon != nullptr)
+		{	
+			// 変数代入
+			pPolygon->m_pos = pos;		// 位置
+			pPolygon->m_scale = scale;	// サイズ
+			pPolygon->m_Tex = texture;	// テクスチャタイプ
+			pPolygon->Init();			// 初期化処理
+		}
+	}
 	return pPolygon;
 }

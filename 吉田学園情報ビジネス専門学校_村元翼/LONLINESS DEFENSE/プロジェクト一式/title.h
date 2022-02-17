@@ -11,9 +11,10 @@
 //--------------------------------------
 #define MAX_TITLE_POLYGON (2)
 #define BLINK_INTERVAL (60)
+#define BLINK_SPEED (5)
 
 //--------------------------------------
-//‘O•ûéŒ¾
+// ‘O•ûéŒ¾
 //--------------------------------------
 class CBg;
 class CScene2D;

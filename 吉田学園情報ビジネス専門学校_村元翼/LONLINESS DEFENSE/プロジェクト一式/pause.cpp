@@ -15,13 +15,14 @@
 //--------------------------
 // 静的メンバ変数の初期化
 //----------------------------
-CBg *CPause::m_pBg = NULL;
+CBg *CPause::m_pBg = nullptr;
 
 //--------------------------
 // コンストラクタ
 //----------------------------
 CPause::CPause(OBJTYPE nPriority) :CScene(nPriority)
 {
+	// メンバ変数の初期化
 	memset(m_pPolygon, 0, sizeof(m_pPolygon));
 	m_bNextMode = false;
 	m_bUninit = false;
@@ -47,16 +48,22 @@ HRESULT CPause::Init(void)
 	m_pBg = CBg::Create(false, CTexture::MapFrame, CScene::OBJTYPE_PAUSE);
 	m_pBg->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.8f));
 
-	if (m_pPolygon != nullptr)
+	// 選択肢のポリゴン生成
+	for (int nCnt = 0; nCnt < MAX_PAUSE; nCnt++)
 	{
-		m_pPolygon[0] = CScene2D::Create(D3DXVECTOR3(SCREEN_WIDTH / 2.0f, SELECT_HEIGHT + (PAUSE_INERVAL * 0), 0.0f), SELECT_SIZE, CTexture::GameBack,CScene::OBJTYPE_PAUSE);
-		m_pPolygon[1] = CScene2D::Create(D3DXVECTOR3(SCREEN_WIDTH / 2.0f, SELECT_HEIGHT + (PAUSE_INERVAL * 1), 0.0f), SELECT_SIZE, CTexture::Retry, CScene::OBJTYPE_PAUSE);
-		m_pPolygon[2] = CScene2D::Create(D3DXVECTOR3(SCREEN_WIDTH / 2.0f, SELECT_HEIGHT + (PAUSE_INERVAL * 2), 0.0f), SELECT_SIZE, CTexture::TitleBack, CScene::OBJTYPE_PAUSE);
+		if (m_pPolygon == nullptr)
+		{
+			m_pPolygon[0] = CScene2D::Create(D3DXVECTOR3(SCREEN_WIDTH / 2.0f, SELECT_HEIGHT + (PAUSE_INERVAL * 0), 0.0f), SELECT_SIZE, CTexture::GameBack, CScene::OBJTYPE_PAUSE);
+			m_pPolygon[1] = CScene2D::Create(D3DXVECTOR3(SCREEN_WIDTH / 2.0f, SELECT_HEIGHT + (PAUSE_INERVAL * 1), 0.0f), SELECT_SIZE, CTexture::Retry, CScene::OBJTYPE_PAUSE);
+			m_pPolygon[2] = CScene2D::Create(D3DXVECTOR3(SCREEN_WIDTH / 2.0f, SELECT_HEIGHT + (PAUSE_INERVAL * 2), 0.0f), SELECT_SIZE, CTexture::TitleBack, CScene::OBJTYPE_PAUSE);
+		}
 	}
 
-	// カーソル
-	m_pCursor = CScene2D::Create(D3DXVECTOR3(m_pos.x, m_pos.y + (PAUSE_INERVAL * 0), 0.0f), D3DXVECTOR3(50.0f, 100.0f, 0.0f), CTexture::Cursol, CScene::OBJTYPE_UI);
-	//m_pTutorialUI = CPolygon::Create(D3DXVECTOR3(SCREEN_WIDTH / 2.0f, 240.0f, 0.0f), D3DXVECTOR3(350.0f, 200.0f, 0.0f), CTexture::Operation01);
+	// カーソルのポリゴン生成
+	if (m_pCursor == nullptr)
+	{
+		m_pCursor = CScene2D::Create(D3DXVECTOR3(m_pos.x, m_pos.y + (PAUSE_INERVAL * 0), 0.0f), D3DXVECTOR3(50.0f, 100.0f, 0.0f), CTexture::Cursol, CScene::OBJTYPE_UI);
+	}
 
 	return S_OK;
 }
@@ -83,12 +90,6 @@ void CPause::Uninit(void)
 		m_pCursor = nullptr;
 	}
 
-	//if (m_pTutorialUI != NULL)
-	//{
-	//	m_pTutorialUI->Uninit();
-	//	delete m_pTutorialUI;
-	//}
-
 	// ポーズ背景の破棄
 	if (m_pBg != nullptr)
 	{
@@ -114,10 +115,7 @@ void CPause::Update(void)
 	if (pKey->GetTrigger(DIK_W) == true ||
 		pXInput->GetButtonTrigger(XINPUT_GAMEPAD_DPAD_UP) == true)
 	{
-		//CManager::GetSound()->PlaySound(CManager::GetSound()->SOUND_LABEL_SE_CURSOL);
-		//CManager::GetSound()->ControllVoice(CManager::GetSound()->SOUND_LABEL_SE_CURSOL, 2.0f);
-		//CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL_SE_SELECT);
-
+		// ポーズのタイプをずらす
 		m_nPauseType--;
 		if (m_nPauseType < 0)
 		{
@@ -125,13 +123,11 @@ void CPause::Update(void)
 		}
 	}
 
+	// 下に行く
 	if (pKey->GetTrigger(DIK_S) == true ||
 		pXInput->GetButtonTrigger(XINPUT_GAMEPAD_DPAD_DOWN) == true)
 	{
-		//CManager::GetSound()->PlaySound(CManager::GetSound()->SOUND_LABEL_SE_CURSOL);
-		//CManager::GetSound()->ControllVoice(CManager::GetSound()->SOUND_LABEL_SE_CURSOL, 2.0f);
-		//CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL_SE_SELECT);
-
+		// ポーズのタイプをずらす
 		m_nPauseType++;
 		if (m_nPauseType >= MAX_PAUSE)
 		{
@@ -156,10 +152,9 @@ void CPause::Update(void)
 
 	}
 
+	// 選択を決定する
 	if ((pKey->GetTrigger(DIK_RETURN) == true || pXInput->GetButtonTrigger(XINPUT_GAMEPAD_A) == true) && m_bNextMode == false)
 	{
-		//CManager::GetSound()->PlaySoundA(CSound::SOUND_LABEL_SE_ENTER);
-
 		switch (m_nPauseType)
 		{
 		case 0:	//ゲームに戻る
@@ -197,39 +192,24 @@ void CPause::Update(void)
 //----------------------------
 void CPause::Draw(void)
 {
-	//if (m_pBg != NULL)
-	//{
-	//	m_pBg->Draw();
-	//}
-
-	//if (m_pTutorialUI != NULL)
-	//{
-	//	m_pTutorialUI->Draw();
-	//}
-
-	//for (int nCnt = 0; nCnt < MAX_PAUSE; nCnt++)
-	//{
-	//	if (m_pPolygon[nCnt] != NULL)
-	//	{
-	//		m_pPolygon[nCnt]->Draw();
-	//	}
-	//}
-	//if (m_pCursor != NULL)
-	//{
-	//	m_pCursor->Draw();
-	//}
+	
 }
+
 //---------------------------------------------------------------
 // インスタンス生成処理
 //---------------------------------------------------------------
 CPause *CPause::Create(D3DXVECTOR3 pos)
 {
 	// インスタンス生成
-	CPause *pPause = new CPause(OBJTYPE_PAUSE);
-	if (pPause != nullptr)
+	CPause *pPause = nullptr;
+	if (pPause == nullptr)
 	{
-		pPause->m_pos = pos;
-		pPause->Init();
+		pPause = new CPause(OBJTYPE_PAUSE);	// メモリ確保
+		if (pPause != nullptr)
+		{
+			pPause->m_pos = pos;
+			pPause->Init();
+		}
 	}
 
 	return pPause;

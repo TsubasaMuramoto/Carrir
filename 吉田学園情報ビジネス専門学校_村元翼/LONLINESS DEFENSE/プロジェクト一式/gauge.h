@@ -11,6 +11,7 @@
 // マクロ定義
 //-----------------------------------------------------
 #define MAX_GAUGE_WIDTH (400.0f)	// ゲージ幅
+#define DECREASE_GAUGE (-30.0f)		// ゲージの減る量
 
 //-----------------------------------------------------
 // クラスの生成
@@ -26,14 +27,13 @@ public:
 	void Update(void);
 	void Draw(void);
 
-	static CGauge *Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale);
-	static void SetGauge(float Set);				// ゲージの増減
+	static CGauge *Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale);	// 生成
+	static void SetGauge(float Set);							// ゲージの増減
 
 private:
-	D3DXVECTOR3			m_pos;						// 位置
-	static D3DXVECTOR3	m_Scale;					// ゲージの大きさ
-	float				m_fScaleSpeed;				// ゲージを増やしていく
-	bool				m_bNextMode;				// 二重押し防止変数
+	D3DXVECTOR3			m_pos;									// 位置
+	static D3DXVECTOR3	m_Scale;								// ゲージの大きさ
+	bool				m_bNextMode;							// 二重押し防止変数
 
 };
 

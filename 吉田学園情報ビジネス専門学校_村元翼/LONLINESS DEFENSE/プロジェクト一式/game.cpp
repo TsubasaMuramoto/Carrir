@@ -27,11 +27,9 @@ CPlayer						*CGame::m_pPlayer = nullptr;
 CTime						*CGame::m_pTime = nullptr;
 CScore						*CGame::m_pScore = nullptr;
 CPolygon					*CGame::m_pMiniMap = nullptr;
-std::vector<CEnemy>			*CGame::m_vpEnemy = nullptr;
 CTarget						*CGame::m_pTarget = nullptr;
 CGauge						*CGame::m_pGauge = nullptr;
 CMiniPolygon				*CGame::m_pMiniPlayer = nullptr;
-std::vector<CMiniPolygon>	*CGame::m_vpMiniEnemy = nullptr;
 int							CGame::m_nSpawnTimer = 0;
 D3DXVECTOR3					CGame::m_ScrollSpeed = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 D3DXVECTOR3					CGame::m_ScrollPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -41,12 +39,10 @@ D3DXVECTOR3					CGame::m_ScrollPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 //--------------------------------------------
 CGame::CGame()
 {
-	m_vpMiniEnemy = nullptr;
 	m_pPlayer = nullptr;
 	m_pBg = nullptr;
 	m_pTime = nullptr;
 	m_pScore = nullptr;
-	m_vpEnemy = nullptr;
 	m_pGauge = nullptr;
 	m_pMiniMap = nullptr;
 	m_pMiniPlayer = nullptr;
@@ -68,10 +64,8 @@ CGame::~CGame()
 //--------------------------------------------
 HRESULT CGame::Init(void)
 {
-	//m_vpEnemy->push_back;
-	//m_vpEnemy->push_back;
 
-	// ターゲットの体力ゲージ
+	// 地球の体力ゲージ生成
 	if (m_pGauge == nullptr)
 	{
 		m_pGaugeFrame = CScene2D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), CTexture::GaugeFrame,CScene::OBJTYPE_POLYGON);
@@ -79,7 +73,7 @@ HRESULT CGame::Init(void)
 		m_pGauge = CGauge::Create(GAUGE_POS, D3DXVECTOR3(MAX_GAUGE_WIDTH, 40.0f, 0.0f));
 	}
 
-	// ミニマップ
+	// ミニマップ生成
 	if (m_pMiniMap == nullptr)
 	{
 		m_pMiniMap = CPolygon::Create
@@ -90,25 +84,25 @@ HRESULT CGame::Init(void)
 		);
 	}
 
-	// 背景
+	// 背景生成
 	if (m_pBg == nullptr)
 	{
 		m_pBg = CBg::Create(true);
 	}
 
-	// 地球
+	// 地球生成
 	if (m_pTarget == nullptr)
 	{
 		m_pTarget = CTarget::Create(D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f), D3DXVECTOR3(500.0f, 500.0f, 0.0f));
 	}
 
-	// プレイヤー
+	// プレイヤー生成
 	if (m_pPlayer == nullptr)
 	{
 		m_pPlayer = CPlayer::Create(D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), D3DXVECTOR3(40.0f, 40.0f, 0.0f));
 	}
 
-	// ミニプレイヤー
+	// ミニプレイヤー生成
 	if (m_pMiniPlayer == nullptr)
 	{
 		m_pMiniPlayer = CMiniPolygon::Create
@@ -129,19 +123,17 @@ HRESULT CGame::Init(void)
 		);
 	}
 
-	// タイム
+	// タイム生成
 	if (m_pTime == nullptr)
 	{
 		m_pTime = CTime::Create(D3DXVECTOR3(SCREEN_WIDTH / 2, 40.0f, 0.0f), D3DXVECTOR3(50.0f,50.0f,0.0f));
 	}
 
-	// スコア
+	// スコア生成
 	if (m_pScore == nullptr)
 	{
 		m_pScore = CScore::Create(TIME_POS, D3DXVECTOR3(50.0f,50.0f,0.0f));
 	}
-
-
 
 	return S_OK;
 }
@@ -151,7 +143,7 @@ HRESULT CGame::Init(void)
 void CGame::Uninit(void)
 {
 	//--------------------------------
-	// シーン2D継承してるやつ
+	// オブジェクトの終了
 	//--------------------------------
 	if (m_pPlayer != nullptr)
 	{
@@ -188,10 +180,11 @@ void CGame::Uninit(void)
 	}
 }
 //--------------------------------------------
-//更新
+// 更新
 //--------------------------------------------
 void CGame::Update(void)
 {
+	// 入力デバイスの取得
 	CInputkeyboard *pKey = CManager::GetKeyboard();
 	CXInput *pGamePad = CManager::GetXInput();
 
@@ -202,6 +195,7 @@ void CGame::Update(void)
 		//-------------------------------------------------------------------------
 		m_nSpawnTimer++;
 
+		// タイマーが敵出現タイムを超える
 		if (m_nSpawnTimer >= POP_TIMING)
 		{
 			std::random_device seed;													// 乱数生成器でシード値を完全ランダムに初期化する
@@ -291,6 +285,7 @@ void CGame::SetScroll(const char* Direction, D3DXVECTOR3 speed)
 		m_ScrollSpeed.y = 0.0f;
 	}
 
+	// スクロール座標更新
 	m_ScrollPos += m_ScrollSpeed;
 }
 

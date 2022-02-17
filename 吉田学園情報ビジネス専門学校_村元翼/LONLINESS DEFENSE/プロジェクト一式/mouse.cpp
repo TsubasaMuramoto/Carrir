@@ -1,10 +1,10 @@
 //---------------------
-//キーボードの入力処理
+// キーボードの入力処理
 //---------------------
 #include"mouse.h"
 
 //----------------------------------------
-//コンストラクタ
+// コンストラクタ
 //----------------------------------------
 
 CMouse::CMouse()
@@ -12,7 +12,7 @@ CMouse::CMouse()
 
 }
 //----------------------------------------
-//デストラクタ
+// デストラクタ
 //----------------------------------------
 CMouse::~CMouse()
 {
@@ -20,11 +20,11 @@ CMouse::~CMouse()
 }
 
 //----------------------------------------
-//初期化処理
+// 初期化処理
 //----------------------------------------
 HRESULT CMouse::Init(HINSTANCE hInstance, HWND hWnd)
 {
-	CInput::Init(hInstance, hWnd);
+	CInput::Init(hInstance, hWnd);	// 入力初期化
 	if (FAILED(m_pInput->CreateDevice(GUID_SysMouse, &m_pDevice, NULL)))
 	{
 		return E_FAIL;
