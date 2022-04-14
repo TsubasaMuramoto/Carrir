@@ -9,10 +9,17 @@
 #include "scene2D.h"
 
 //=============================================================================
+// マクロ定義
+//=============================================================================
+#define MAX_SPEED		(10.0f)														// 最大速度
+#define SHOOT_INTERVAL	(0.5f)														// 弾発射間隔
+#define INERTIA_SPEED	(0.2f)														// 慣性速度(加速and減速)
+#define PLAYER_POS		(D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f))	// プレイヤー位置
+#define PLAYER_SIZE		(D3DXVECTOR3(40.0f, 40.0f, 0.0f))							// プレイヤーサイズ
+
+//=============================================================================
 // 前方宣言
 //=============================================================================
-class CTexture;
-class CBullet;
 class CXInput;
 
 //=============================================================================
@@ -21,6 +28,22 @@ class CXInput;
 class CPlayer : public CScene2D
 {
 public:
+
+	// 移動方向
+	typedef enum
+	{
+		DIRECTION_UP = 0,	// 上
+		DIRECTION_DOWN,		// 下
+		DIRECTION_LEFT,		// 左
+		DIRECTION_RIGHT,	// 右
+		DIRECTION_NO_UP,	// 上無
+		DIRECTION_NO_DOWN,	// 下無
+		DIRECTION_NO_LEFT,	// 左無
+		DIRECTION_NO_RIGHT,	// 右無
+		DIRECTION_MAX
+
+	}MOVE_DIRECTION;
+
 
 	CPlayer(OBJTYPE nPriority = OBJTYPE_PLAYER);		// コンストラクタ
 	~CPlayer();											// デストラクタ
@@ -35,9 +58,10 @@ public:
 	void Move(void);																// プレイヤーの移動関数
 	void MovingLimit(D3DXVECTOR3& pos, D3DXVECTOR3 &scale, D3DXVECTOR3 &speed);		// 移動限界設定関数
 	void Rotate(D3DXVECTOR3 pos, D3DXVECTOR3 scale, float Angle);					// 回転関数
-	void Acceleration(D3DXVECTOR3& vec, D3DXVECTOR3 speed, float Maxspeed);			// 慣性関数
-	float RotateGamePad(CXInput *pGamePad);											// ゲームパッドでの回転関数
+	void Acceleration(D3DXVECTOR3 &velo, D3DXVECTOR3 &speed,const float &Maxspeed);	// 慣性関数
+	float RotateGamePad(CXInput *pXInput);											// ゲームパッドでの回転関数
 	float FeaturedMouse(D3DXVECTOR3 pos, POINT mousePoint);							// マウス追従処理関数
+	bool InputDirection(const MOVE_DIRECTION &moveDir);							// 移動方向入力関数
 
 	//-------------------------
 	// Getter & Setter

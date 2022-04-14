@@ -10,10 +10,6 @@
 //-------------------------------------------
 // マクロ定義
 //-------------------------------------------
-#define MAX_PAUSE (3)
-#define PAUSE_INERVAL (100.0f)
-#define SELECT_HEIGHT (300.0f)
-#define SELECT_SIZE (D3DXVECTOR3(350.0f,60.0f,0.0f))
 
 //-------------------------------------------
 // 前方宣言
@@ -37,6 +33,17 @@ public:
 		FADE_OUT,
 	}PAUSE_FADE;
 
+	//-----------------------------------------
+	// ポーズの選択状態列挙
+	//-----------------------------------------
+	typedef enum
+	{
+		SELECT_RETURNGAME = 0,
+		SELECT_RETRY,
+		SELECT_RETURNTITLE,
+		SELECT_MAX
+	}PAUSE_SELECT;
+
 	CPause(OBJTYPE nPriority = OBJTYPE_PAUSE);
 	~CPause();
 	HRESULT Init(void);
@@ -46,15 +53,13 @@ public:
 	static CPause *Create(D3DXVECTOR3 pos);			// インスタンス生成処理
 
 private:
-	//void FadeInOut(int nFade);					// ポーズのフェードに使う関数？
-	//void SetPAUSE(int nType);						// PAUSEに使うポリゴンの生成？
 	D3DXVECTOR3		m_pos;							// 位置
 	D3DXVECTOR3		m_Speed;						// 速度
 	float			m_fAlpha;						// ポーズ背景の透明度
 	int				m_nPauseType;					// ポーズ選択
 	bool			m_bUninit;						// pauseを終了させるか
 	bool			m_bNextMode;					// 次のモードにいくか
-	CScene2D		*m_pPolygon[MAX_PAUSE];			// ポーズ選択のポリゴン
+	CScene2D		*m_pPolygon[SELECT_MAX];		// ポーズ選択のポリゴン
 	CScene2D		*m_pCursor;						// 選択カーソルのポリゴン
 	CScene2D		*m_pTutorialUI;					// 操作説明UI
 	static CBg		*m_pBg;							// ポーズ背景

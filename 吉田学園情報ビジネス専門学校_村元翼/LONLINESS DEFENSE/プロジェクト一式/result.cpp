@@ -1,24 +1,19 @@
 //--------------------------------------
-//リザルト画面の処理
+// リザルト画面の処理
 //--------------------------------------
 #include "result.h"
-#include "bg.h"
-#include "texture.h"
 #include "manager.h"
 #include "keyboard.h"
 #include "fade.h"
-#include "polygon.h"
 #include "ranking.h"
 #include "XInput.h"
-//#include "sound.h"
+#include "sound.h"
 
 //--------------------------------------------
 // コンストラクタ
 //--------------------------------------------
 CResult::CResult()
 {
-	m_bNextMode = false;
-	m_Cursol = NULL;
 	m_bNextMode = false;
 }
 //--------------------------------------------
@@ -51,7 +46,6 @@ void CResult::Uninit(void)
 	if (m_pRanking != nullptr)
 	{
 		m_pRanking->Uninit();
-		delete m_pRanking;
 		m_pRanking = nullptr;
 	}
 }
@@ -65,7 +59,7 @@ void CResult::Update(void)
 	CXInput *pGamePad = CManager::GetXInput();	
 
 	// ENTERを押す
-	if (pGamePad->GetButtonTrigger(XINPUT_GAMEPAD_START) || pKey->GetTrigger(DIK_RETURN) == true && m_bNextMode == false)
+	if (pGamePad->GetButtonTrigger(XINPUT_GAMEPAD_START) || pKey->GetTrigger(DIK_RETURN) && !m_bNextMode)
 	{
 		CFade::SetFade(CManager::MODE_TITLE);			// ゲームモードへ
 		m_bNextMode = true;								// ENTER連打防止

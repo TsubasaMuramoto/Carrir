@@ -70,7 +70,7 @@ void CMouse::Update(void)
 		{
 			m_aKeyStateTrigger.rgbButtons[nCntKey] = (m_aKeyState.rgbButtons[nCntKey] ^ aKeyState.rgbButtons[nCntKey])&aKeyState.rgbButtons[nCntKey];
 
-			m_aKeyState = aKeyState;//キーボードの入力情報の保存
+			m_aKeyState = aKeyState;	// キーボードの入力情報の保存
 		}
 	}
 

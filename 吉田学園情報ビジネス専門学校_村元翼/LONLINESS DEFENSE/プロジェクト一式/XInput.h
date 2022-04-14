@@ -36,11 +36,12 @@ public:
 	CXInput();
 	~CXInput();
 
-	void UpdateGamepad(void);			// 更新
-	bool GetGamepadPress(int nButton);	// プレス情報
-	bool GetButtonTrigger(int nButton);	// トリガー情報
-	GAMEPAD *GetGamePad(void);			// ゲームパッドの情報を取得
-	GAMEPAD	m_GamePad;					// ゲームパッドクラス
+	void UpdateGamepad(void);						// 更新
+	bool GetGamepadPress(int nButton);				// プレス情報
+	bool GetButtonTrigger(int nButton);				// トリガー情報
+	GAMEPAD *GetGamePad(void);						// ゲームパッドの情報を取得
+	GAMEPAD	m_GamePad;								// ゲームパッドクラス
+	void SetVibration(int nPowerR,int nPowerL);		// バイブレーション設定
 
 private:
 	XINPUT_STATE m_laststate;			// 最後に保存したステート

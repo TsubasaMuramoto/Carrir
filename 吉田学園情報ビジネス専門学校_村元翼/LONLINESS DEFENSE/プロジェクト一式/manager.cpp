@@ -19,6 +19,7 @@
 #include "mouse.h"
 #include "XInput.h"
 #include "play_data.h"
+#include "sound.h"
 
 //--------------------------------------
 //静的メンバ変数宣言
@@ -35,10 +36,18 @@ CPause			*CManager::m_pPause = nullptr;
 CMouse			*CManager::m_pMouse = nullptr;
 CXInput			*CManager::m_pXInput = nullptr;
 CPlayData		*CManager::m_pPlayData = nullptr;
+CSound			*CManager::m_pSound = nullptr;
 bool			CManager::m_bGamepadSwitch = false;
 bool			CManager::m_bStop = false;
 bool			CManager::m_bPause = false;
-CManager::MODE	CManager::m_Mode = CManager::MODE_TITLE;
+
+#ifdef _DEBUG
+CManager::MODE	CManager::m_Mode = MODE_GAME;	// デバッグモード時に通る
+#endif
+
+#ifndef _DEBUG
+CManager::MODE	CManager::m_Mode = MODE_TITLE;	// リリースモード時に通る
+#endif
 
 //--------------------------------------------
 //コンストラクタ
@@ -59,6 +68,17 @@ CManager::~CManager()
 //--------------------------------------------
 HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 {
+	// サウンドの生成
+	if(m_pSound == nullptr)
+	{ 
+		m_pSound = new CSound;
+
+		if (m_pSound != nullptr)
+		{
+			m_pSound->Init(hWnd);
+		}
+	}
+
 	//プレイデータクラスの生成
 	if (m_pPlayData == nullptr)
 	{
@@ -142,7 +162,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 //--------------------------------------------
 void CManager::Uninit(void)
 {
-	// シーンの破棄
+	// オブジェクトの破棄
 	CScene::ReleaseAll();
 
 	// Xinputの破棄
@@ -193,11 +213,19 @@ void CManager::Uninit(void)
 	}
 
 	// プレイデータの破棄
-	if (m_pPlayData != NULL)
+	if (m_pPlayData != nullptr)
 	{
 		m_pPlayData->Uninit();
 		delete m_pPlayData;
-		m_pPlayData = NULL;
+		m_pPlayData = nullptr;
+	}
+
+	// プレイデータの破棄
+	if (m_pSound != nullptr)
+	{
+		m_pSound->Uninit();
+		delete m_pSound;
+		m_pSound = nullptr;
 	}
 }
 //--------------------------------------------
@@ -254,20 +282,18 @@ void CManager::Update(void)
 			m_pGame->Update();
 
 			// ポーズ切り替え(Pを押す)
-			if (GetKeyboard()->GetTrigger(DIK_P) == true || GetXInput()->GetButtonTrigger(XINPUT_GAMEPAD_START) == true)
+			if (GetKeyboard()->GetTrigger(DIK_P)|| GetXInput()->GetButtonTrigger(XINPUT_GAMEPAD_START))
 			{
-				m_bStop = m_bStop ? false : true;		// ストップを切り替える
+				m_bStop = !m_bStop;			// ストップを切り替える
 
-				m_bPause = m_bPause ? false : true;		// ポーズを切り替える
+				m_bPause = !m_bPause;		// ポーズを切り替える
 			}
 
 			// ストップ状態
-			if (m_bStop == true)
+			if (m_bStop)
 			{
 				// コントローラーのバイブレーションと止める
-				m_pXInput->m_GamePad.m_vibration.wLeftMotorSpeed = 0;
-				m_pXInput->m_GamePad.m_vibration.wRightMotorSpeed = 0;
-				XInputSetState(0, &m_pXInput->m_GamePad.m_vibration);
+				m_pXInput->SetVibration(0, 0);
 
 				// ポーズの生成
 				if (m_pPause == nullptr)

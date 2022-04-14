@@ -7,13 +7,6 @@
 #include "scene.h"
 
 //---------------------------------------
-// マクロ定義
-//---------------------------------------
-#define GAUGE_POS (D3DXVECTOR3(50.0f,50.0f,0.0f))	// ゲージ位置
-#define TIME_POS (D3DXVECTOR3(980.0f, 680.0f, 0.0f))// タイム位置
-#define POP_TIMING (60)								// 出現のタイミング
-
-//---------------------------------------
 // 前方宣言
 //---------------------------------------
 class CScene2D;
@@ -39,11 +32,13 @@ public:
 	//--------------------------
 	typedef enum
 	{
-		LEVEL_EASY=0,
-		LEVEL_NORMAL,
-		LEVEL_HARD,
-		LEVEL_MAX
-	}LEVEL;
+		FROM_NONE = 0,
+		FROM_UP,		// 上
+		FROM_DOWN,		// 下
+		FROM_LEFT,		// 左
+		FROM_RIGHT,		// 右
+		FROM_MAX
+	}POP_FROM;
 
 	CGame();
 	~CGame();

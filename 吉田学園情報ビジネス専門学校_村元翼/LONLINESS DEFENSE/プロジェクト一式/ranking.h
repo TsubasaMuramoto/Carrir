@@ -37,20 +37,25 @@ public:
 	CRanking();					// コンストラクタ
 	~CRanking();				// デストラクタ
 
-	//メンバ関数
-	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 size);
-	HRESULT Init(void) { return S_OK; }
-	void Uninit(void);
-	void Update(void);
-	void Draw(void);
+	// メンバ関数
+	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 size);	// 初期化
+	HRESULT Init(void) { return S_OK; }					// 初期化
+	void Uninit(void);									// 終了
+	void Update(void);									// 更新
+	void Draw(void);									// 描画
 
-	static CRanking *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size);
+	static CRanking *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size);		// インスタンス生成
+
+#ifdef _DEBUG
+	void ClearZeroRank(void);										// スコア0クリア
+#endif
 
 private:
 	static CScore *m_apScore[MAX_RANKING];	// スコアクラス
-	CScene2D *m_apScene2D[MAX_RANKING];		// シーン２?クラス
+	CScene2D *m_apScene2D[MAX_RANKING];		// シーン2Dクラス
 	int m_nScore[MAX_SCORE_DATA];			// スコア
 	int m_nNowScore;						// 今回のスコア
+	bool m_bClear;							// 0クリア判定
 	D3DCOLORVALUE	m_col;					// カラー
 };
 

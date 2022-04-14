@@ -5,9 +5,9 @@
 #include "main.h" 
 #include "manager.h"
 #include "number.h"
-#include "renderer.h"
 #include "time.h"
 #include "fade.h"
+#include "sound.h"
 
 //---------------------------------------------------------------
 // コンストラクタ
@@ -16,8 +16,8 @@ CTime::CTime(OBJTYPE nPriority) : CScene(nPriority)
 {
 	// メンバ変数の初期化
 	m_bNextMode = false;
-	m_nFrame = 0;			// フレーム初期化
-	m_nTime = TIME;			// 制限時間の設定
+	m_nFrame = 0;				// フレーム初期化
+	m_nTime = TIME_LIMIT;		// 制限時間の設定
 }
 
 //---------------------------------------------------------------
@@ -85,14 +85,14 @@ void CTime::Update()
 	m_nFrame++;// フレームを回す
 
 	// 60フレーム回ったら
-	if (m_nFrame >= 60)
+	if (m_nFrame >= TIME_FRAME)
 	{
 		m_nFrame = 0;	// フレーム初期化
-		m_nTime -= 1;	// タイムを1秒減らす
+		m_nTime --;	// タイムを1秒減らす
 	}
 
 	// 20秒以下になったら赤色にする
-	if (m_nTime <= 20)
+	if (m_nTime <= TIME_REDZONE)
 	{
 		for (int nCnt = 0; nCnt < m_nAll; nCnt++)
 		{
@@ -101,11 +101,15 @@ void CTime::Update()
 	}
 
 	// 0秒より低くならないようにする
-	if (m_nTime <= 0 && m_bNextMode == false)
+	if (m_nTime <= 0 && !m_bNextMode)
 	{
+		// サウンド取得
+		CSound *pSound = CManager::GetSound();
+
+		m_bNextMode = true;
 		m_nTime = 0;
 		CFade::SetFade(CManager::MODE_RESULT);
-		m_bNextMode = true;
+		pSound->Stop(pSound->SOUND_LABEL_GAME_BGM);
 	}
 
 	SetTime();//描画の設定
@@ -116,7 +120,7 @@ void CTime::Update()
 //---------------------------------------------------------------
 void CTime::Draw()
 {
-	for (int nCntTime =0; nCntTime < m_nAll; nCntTime++)
+	for (int nCntTime = 0; nCntTime < m_nAll; nCntTime++)
 	{
 		if (m_apNumber[nCntTime] != nullptr)
 		{

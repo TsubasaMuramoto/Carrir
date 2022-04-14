@@ -1,8 +1,8 @@
 //----------------------------------
 //オブジェクトの処理
 //----------------------------------
-#ifndef _SCENE_H
-#define _SCENE_H
+#ifndef _SCENE_H_
+#define _SCENE_H_
 #include "main.h"
 
 //----------------------------------
@@ -34,7 +34,7 @@ public:
 	}OBJTYPE;
 
 	CScene();
-	CScene(OBJTYPE nPriority);
+	explicit CScene(OBJTYPE nPriority);
 	virtual~CScene();
 	virtual HRESULT Init(void) = 0;
 	virtual void Uninit(void) = 0;
@@ -89,4 +89,4 @@ protected:
 	void Release(void);//オブジェクト単体のインスタンス破棄
 
 };
-#endif // !_SCENE_H
+#endif // !_SCENE_H_

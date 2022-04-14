@@ -17,39 +17,45 @@
 #include "target.h"
 #include "gauge.h"
 #include "MiniPolygon.h"
+#include "sound.h"
+
+//---------------------------------------
+// マクロ定義
+//---------------------------------------
+#define POP_TIMING (60)								// 出現のタイミング
 
 //-----------------------------------------------------
 // 静的メンバ変数の初期化
 //-----------------------------------------------------
-CScene2D					*CGame::m_pGaugeFrame = nullptr;
-CBg							*CGame::m_pBg = nullptr;
-CPlayer						*CGame::m_pPlayer = nullptr;
-CTime						*CGame::m_pTime = nullptr;
-CScore						*CGame::m_pScore = nullptr;
-CPolygon					*CGame::m_pMiniMap = nullptr;
-CTarget						*CGame::m_pTarget = nullptr;
-CGauge						*CGame::m_pGauge = nullptr;
-CMiniPolygon				*CGame::m_pMiniPlayer = nullptr;
-int							CGame::m_nSpawnTimer = 0;
-D3DXVECTOR3					CGame::m_ScrollSpeed = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-D3DXVECTOR3					CGame::m_ScrollPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+CScene2D		*CGame::m_pGaugeFrame	= nullptr;
+CBg				*CGame::m_pBg			= nullptr;
+CPlayer			*CGame::m_pPlayer		= nullptr;
+CTime			*CGame::m_pTime			= nullptr;
+CScore			*CGame::m_pScore		= nullptr;
+CPolygon		*CGame::m_pMiniMap		= nullptr;
+CTarget			*CGame::m_pTarget		= nullptr;
+CGauge			*CGame::m_pGauge		= nullptr;
+CMiniPolygon	*CGame::m_pMiniPlayer	= nullptr;
+int				CGame::m_nSpawnTimer	= 0;
+D3DXVECTOR3		CGame::m_ScrollSpeed	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+D3DXVECTOR3		CGame::m_ScrollPos		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 //--------------------------------------------
 //コンストラクタ
 //--------------------------------------------
 CGame::CGame()
 {
-	m_pPlayer = nullptr;
-	m_pBg = nullptr;
-	m_pTime = nullptr;
-	m_pScore = nullptr;
-	m_pGauge = nullptr;
-	m_pMiniMap = nullptr;
-	m_pMiniPlayer = nullptr;
-	m_pTarget = nullptr;
-	m_bNextMode = false;
-	m_ScrollSpeed = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_ScrollPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_pPlayer		= nullptr;
+	m_pBg			= nullptr;
+	m_pTime			= nullptr;
+	m_pScore		= nullptr;
+	m_pGauge		= nullptr;
+	m_pMiniMap		= nullptr;
+	m_pMiniPlayer	= nullptr;
+	m_pTarget		= nullptr;
+	m_bNextMode		= false;
+	m_ScrollSpeed	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_ScrollPos		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 }
 
 //--------------------------------------------
@@ -64,7 +70,6 @@ CGame::~CGame()
 //--------------------------------------------
 HRESULT CGame::Init(void)
 {
-
 	// 地球の体力ゲージ生成
 	if (m_pGauge == nullptr)
 	{
@@ -76,12 +81,7 @@ HRESULT CGame::Init(void)
 	// ミニマップ生成
 	if (m_pMiniMap == nullptr)
 	{
-		m_pMiniMap = CPolygon::Create
-		(
-			D3DXVECTOR3(SCREEN_WIDTH - (SCREEN_WIDTH / DIVISION_SIZE), SCREEN_HEIGHT / DIVISION_SIZE, 0.0f),
-			D3DXVECTOR3(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, 0.0f),
-			CTexture::MapFrame
-		);
+		m_pMiniMap = CPolygon::Create(MINIMAP_POS, MINIMAP_SIZE, CTexture::MapFrame);
 	}
 
 	// 背景生成
@@ -93,13 +93,13 @@ HRESULT CGame::Init(void)
 	// 地球生成
 	if (m_pTarget == nullptr)
 	{
-		m_pTarget = CTarget::Create(D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f), D3DXVECTOR3(500.0f, 500.0f, 0.0f));
+		m_pTarget = CTarget::Create(TARGET_POS, TARGET_SIZE);
 	}
 
 	// プレイヤー生成
 	if (m_pPlayer == nullptr)
 	{
-		m_pPlayer = CPlayer::Create(D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), D3DXVECTOR3(40.0f, 40.0f, 0.0f));
+		m_pPlayer = CPlayer::Create(PLAYER_POS, PLAYER_SIZE);
 	}
 
 	// ミニプレイヤー生成
@@ -126,13 +126,13 @@ HRESULT CGame::Init(void)
 	// タイム生成
 	if (m_pTime == nullptr)
 	{
-		m_pTime = CTime::Create(D3DXVECTOR3(SCREEN_WIDTH / 2, 40.0f, 0.0f), D3DXVECTOR3(50.0f,50.0f,0.0f));
+		m_pTime = CTime::Create(TIME_POS, TIME_SIZE);
 	}
 
 	// スコア生成
 	if (m_pScore == nullptr)
 	{
-		m_pScore = CScore::Create(TIME_POS, D3DXVECTOR3(50.0f,50.0f,0.0f));
+		m_pScore = CScore::Create(SCORE_POS, SCORE_SIZE);
 	}
 
 	return S_OK;
@@ -188,7 +188,7 @@ void CGame::Update(void)
 	CInputkeyboard *pKey = CManager::GetKeyboard();
 	CXInput *pGamePad = CManager::GetXInput();
 
-	if (CManager::GetPause() == false)
+	if (!CManager::GetPause())
 	{
 		//-------------------------------------------------------------------------
 		// 敵のランダム出現処理
@@ -200,57 +200,48 @@ void CGame::Update(void)
 		{
 			std::random_device seed;													// 乱数生成器でシード値を完全ランダムに初期化する
 			std::mt19937_64 mtRand(seed());												// 疑似乱数を作り出す
-			std::uniform_int_distribution<> Pop_Pos(1, 4);								// 出現位置を決める(上下左右の４方向)
+			std::uniform_int_distribution<> Pop_Pos(1, FROM_MAX - 1);					// 出現位置を決める(上下左右の４方向)
 			int nPop = Pop_Pos(mtRand);													// 乱数結果を整数に代入する
 
 				// 上下
-				if (nPop == 1 || nPop == 2)
+			if (nPop == FROM_UP || nPop == FROM_DOWN)
+			{
+				std::uniform_real_distribution<float> RangeX(0.0f, SCREEN_WIDTH * 2);	// 指定した範囲内の数値を等確率で返す(最小値以上、最大値"未満")
+
+				// 上
+				if (nPop == FROM_UP)
 				{
-					std::uniform_real_distribution<float> RangeX(0.0f, SCREEN_WIDTH * 2);	// 指定した範囲内の数値を等確率で返す(最小値以上、最大値"未満")
-
-					// 上
-					if (nPop == 1)
-					{
-						CEnemy::Create(D3DXVECTOR3(RangeX(mtRand), 0.0f, 0.0f) - (m_ScrollPos / 2), ENEMY_SIZE);
-					}
-
-					// 下
-					else if (nPop == 2)
-					{
-						CEnemy::Create(D3DXVECTOR3(RangeX(mtRand), SCREEN_HEIGHT * 2, 0.0f) - (m_ScrollPos / 2), ENEMY_SIZE);
-					}
+					CEnemy::Create(D3DXVECTOR3(RangeX(mtRand), 0.0f, 0.0f) - (m_ScrollPos / 2), ENEMY_SIZE);
 				}
 
-				// 左右
-				else if (nPop == 3 || nPop == 4)
+				// 下
+				else if (nPop == FROM_DOWN)
 				{
-					std::uniform_real_distribution<float> RangeY(0.0f, SCREEN_HEIGHT * 2);	// 指定した範囲内の数値を等確率で返す(最小値以上、最大値"未満")
-
-					// 左
-					if (nPop == 3)
-					{
-						CEnemy::Create(D3DXVECTOR3(0.0f, RangeY(mtRand), 0.0f) - (m_ScrollPos / 2), ENEMY_SIZE);
-					}
-
-					// 右
-					else if (nPop == 4)
-					{
-						CEnemy::Create(D3DXVECTOR3(SCREEN_WIDTH * 2, RangeY(mtRand), 0.0f) - (m_ScrollPos / 2), ENEMY_SIZE);
-					}
+					CEnemy::Create(D3DXVECTOR3(RangeX(mtRand), SCREEN_HEIGHT * 2, 0.0f) - (m_ScrollPos / 2), ENEMY_SIZE);
 				}
+			}
+
+			// 左右
+			else if (nPop == FROM_LEFT || nPop == FROM_RIGHT)
+			{
+				std::uniform_real_distribution<float> RangeY(0.0f, SCREEN_HEIGHT * 2);	// 指定した範囲内の数値を等確率で返す(最小値以上、最大値"未満")
+
+				// 左
+				if (nPop == FROM_LEFT)
+				{
+					CEnemy::Create(D3DXVECTOR3(0.0f, RangeY(mtRand), 0.0f) - (m_ScrollPos / 2), ENEMY_SIZE);
+				}
+
+				// 右
+				else if (nPop == FROM_RIGHT)
+				{
+					CEnemy::Create(D3DXVECTOR3(SCREEN_WIDTH * 2, RangeY(mtRand), 0.0f) - (m_ScrollPos / 2), ENEMY_SIZE);
+				}
+			}
 
 			// タイマーリセット
 			m_nSpawnTimer = 0;
 		}
-
-#if _DEBUG
-		// ENTERを押す
-		if (pGamePad->GetButtonTrigger(XINPUT_GAMEPAD_START) || pKey->GetTrigger(DIK_RETURN) == true && m_bNextMode == false)
-		{
-			CFade::SetFade(CManager::MODE_RESULT);			// ゲームモードへ
-			m_bNextMode = true;								// ENTER連打防止
-		}
-#endif
 	}
 }
 //--------------------------------------------
@@ -275,12 +266,12 @@ void CGame::SetScroll(const char* Direction, D3DXVECTOR3 speed)
 		m_ScrollSpeed.y = speed.y;
 	}
 
-	if (Direction == "noX")
+	if (Direction == "StopX")
 	{
 		m_ScrollSpeed.x = 0.0f;
 	}
 
-	if (Direction == "noY")
+	if (Direction == "StopY")
 	{
 		m_ScrollSpeed.y = 0.0f;
 	}

@@ -164,7 +164,7 @@ void CScene2D::SetPos(D3DXVECTOR3 vtx0, D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DX
 //------------------------------------------------------------
 // 長方形ポリゴン(回転込み)
 //------------------------------------------------------------
-void CScene2D::SetPos(D3DXVECTOR3 pos, D3DXVECTOR3 scale, D3DXVECTOR3 Rotvtx0, D3DXVECTOR3 Rotvtx1, D3DXVECTOR3 Rotvtx2, D3DXVECTOR3 Rotvtx3)
+void CScene2D::SetPos(D3DXVECTOR3 pos, D3DXVECTOR3 scale, D3DXVECTOR3 *Rotvtx)
 {
 	CScene::SetPos(pos);
 	CScene::SetScale(scale);
@@ -174,10 +174,10 @@ void CScene2D::SetPos(D3DXVECTOR3 pos, D3DXVECTOR3 scale, D3DXVECTOR3 Rotvtx0, D
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	// バッファの生成
-	pVtx[0].pos = D3DXVECTOR3(pos.x + Rotvtx0.x, pos.y + Rotvtx0.y, 0.0f);
-	pVtx[1].pos = D3DXVECTOR3(pos.x + Rotvtx1.x, pos.y + Rotvtx1.y, 0.0f);
-	pVtx[2].pos = D3DXVECTOR3(pos.x + Rotvtx2.x, pos.y + Rotvtx2.y, 0.0f);
-	pVtx[3].pos = D3DXVECTOR3(pos.x + Rotvtx3.x, pos.y + Rotvtx3.y, 0.0f);
+	pVtx[0].pos = D3DXVECTOR3(pos.x + Rotvtx[0].x, pos.y + Rotvtx[0].y, 0.0f);
+	pVtx[1].pos = D3DXVECTOR3(pos.x + Rotvtx[1].x, pos.y + Rotvtx[1].y, 0.0f);
+	pVtx[2].pos = D3DXVECTOR3(pos.x + Rotvtx[2].x, pos.y + Rotvtx[2].y, 0.0f);
+	pVtx[3].pos = D3DXVECTOR3(pos.x + Rotvtx[3].x, pos.y + Rotvtx[3].y, 0.0f);
 
 	m_pVtxBuff->Unlock();
 }

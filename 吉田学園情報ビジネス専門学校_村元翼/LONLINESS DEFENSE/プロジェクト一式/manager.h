@@ -21,6 +21,7 @@ class CPause;
 class CMouse;
 class CXInput;
 class CPlayData;
+class CSound;
 class CManager
 {
 public:
@@ -56,7 +57,8 @@ public:
 	static CPause *GetPause(void)			{ return m_pPause; }		// ポーズの取得
 	static CXInput *GetXInput(void)			{ return m_pXInput; }		// Xinputの取得
 	static MODE GetMode(void)				{ return m_Mode; }			// モードの取得
-	static CPlayData *GetPlayData(void)		{ return m_pPlayData; }		//プレイデータ取得処理
+	static CPlayData *GetPlayData(void)		{ return m_pPlayData; }		// プレイデータ取得
+	static CSound *GetSound(void)			{ return m_pSound; }		// サウンド取得
 
 	static void SetMode(MODE mode);																	// モードの設定
 	static void SetPause(bool bPause, bool bStop = false) { m_bPause = bPause; m_bStop = bStop;}	// ポーズの設定
@@ -74,7 +76,8 @@ private:
 	static MODE				m_Mode;				// 現在のモード
 	static CPause			*m_pPause;			// ポーズクラス
 	static CMouse			*m_pMouse;			// マウスクラス
-	static CPlayData		*m_pPlayData;		//  プレイデータクラス
+	static CPlayData		*m_pPlayData;		// プレイデータクラス
+	static CSound			*m_pSound;			// サウンドクラス
 
 	static bool				m_bGamepadSwitch;	// ゲームパッド入力のオンオフ
 	static bool				m_bStop;			// ストップするか

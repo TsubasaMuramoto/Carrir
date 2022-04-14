@@ -63,3 +63,14 @@ CXInput::GAMEPAD *CXInput::GetGamePad(void)
 {
 	return &m_GamePad;
 }
+
+//-----------------------------------------------------------------------------
+// バイブレーション設定
+//-----------------------------------------------------------------------------
+void CXInput::SetVibration(int nPowerR, int nPowerL)
+{
+	// 振動させる
+	m_GamePad.m_vibration.wLeftMotorSpeed = nPowerL;
+	m_GamePad.m_vibration.wRightMotorSpeed = nPowerR;
+	XInputSetState(0, &m_GamePad.m_vibration);
+}

@@ -7,8 +7,14 @@
 #include "manager.h"
 #include "keyboard.h"
 #include "fade.h"
-#include "polygon.h"
 #include "XInput.h"
+#include "sound.h"
+
+//--------------------------------------
+// マクロ定義
+//--------------------------------------
+#define BLINK_INTERVAL (60)
+#define BLINK_SPEED (5)
 
 //--------------------------------------------
 // コンストラクタ
@@ -31,24 +37,20 @@ CTitle::~CTitle()
 }
 
 //--------------------------------------------
-//初期化
+// 初期化
 //--------------------------------------------
 HRESULT CTitle::Init(void)
 {
-	CBg::Create(false ,CTexture::Target,CScene::OBJTYPE_BG);	//背景
+	CBg::Create(false ,CTexture::Target,CScene::OBJTYPE_BG);	// 背景
 
 	m_pTitle[0] = CScene2D::Create(D3DXVECTOR3(SCREEN_WIDTH / 2, 200.0f, 0.0f), D3DXVECTOR3(1000.0f, 300.0f, 0.0f), CTexture::Title, CScene::OBJTYPE_BG);
 	m_pTitle[1] = CScene2D::Create(D3DXVECTOR3(SCREEN_WIDTH / 2, 500.0f, 0.0f), D3DXVECTOR3(600.0f, 200.0f, 0.0f), CTexture::PressEnter,CScene::OBJTYPE_BG);
-	//m_Polygon[0] = CPolygon::Create(D3DXVECTOR3(SCREEN_WIDTH/2.0f, SCREEN_HEIGHT / 2 - 280.0f, 0.0f), D3DXVECTOR3(430.0f, 80.0f, 0.0f), CTexture::Titlelogo);	//タイトルロゴ
-	//m_Polygon[1] = CPolygon::Create(D3DXVECTOR3(900.0f, SCREEN_HEIGHT / 2 + 50.0f, 0.0f), D3DXVECTOR3(300.0f, 80.0f, 0.0f), CTexture::GameStart);	//ゲームスタート
-	//m_Polygon[2] = CPolygon::Create(D3DXVECTOR3(900.0f, SCREEN_HEIGHT / 2 + 250, 0.0f), D3DXVECTOR3(300.0f, 40.0f, 0.0f), CTexture::Operation);	//チュートリアル
-	//m_Cursol = CPolygon::Create(D3DXVECTOR3(900.0f, SCREEN_HEIGHT / 2 + 250, 0.0f), D3DXVECTOR3(40.0f, 40.0f, 0.0f), CTexture::Cursol);	//カーソル
 
 	return S_OK;
 }
 
 //--------------------------------------------
-//終了
+// 終了
 //--------------------------------------------
 void CTitle::Uninit(void)
 {
@@ -64,10 +66,11 @@ void CTitle::Uninit(void)
 }
 
 //--------------------------------------------
-//更新
+// 更新
 //--------------------------------------------
 void CTitle::Update(void)
 {
+	// オブジェクト取得
 	CInputkeyboard *pKey = CManager::GetKeyboard();
 	CXInput *pGamePad = CManager::GetXInput();
 
@@ -88,8 +91,11 @@ void CTitle::Update(void)
 	}
 
 	// ENTERを押す
-	if (pGamePad->GetButtonTrigger(XINPUT_GAMEPAD_START) || pKey->GetTrigger(DIK_RETURN) == true && m_bNextMode == false)
+	if (pGamePad->GetButtonTrigger(XINPUT_GAMEPAD_START) || pKey->GetTrigger(DIK_RETURN) && !m_bNextMode)
 	{
+		// オブジェクト取得
+		CSound *pSound = CManager::GetSound();
+
 		m_nMultiFrame = BLINK_SPEED;
 		CFade::SetFade(CManager::MODE_TUTORIAL);		// ゲームモードへ
 		m_bNextMode = true;								// ENTER連打防止
@@ -97,7 +103,7 @@ void CTitle::Update(void)
 }
 
 //--------------------------------------------
-//描画
+// 描画
 //--------------------------------------------
 void CTitle::Draw(void)
 {

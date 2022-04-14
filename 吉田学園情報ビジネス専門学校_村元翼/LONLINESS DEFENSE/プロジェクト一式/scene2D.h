@@ -1,16 +1,18 @@
-//----------------------------------
+//*****************************************************************************
 // ポリゴンの処理
-//----------------------------------
+//*****************************************************************************
 #ifndef _SCENE2D_H
 #define _SCENE2D_H
 #include "main.h"
 #include "scene.h"
 #include "texture.h"
 
-//----------------------------------
+//*****************************************************************************
 // マクロ定義
-//----------------------------------
-#define FVF_VERTEX_2D (D3DFVF_XYZRHW|D3DFVF_DIFFUSE|D3DFVF_TEX1)
+//*****************************************************************************
+#define FVF_VERTEX_2D	(D3DFVF_XYZRHW|D3DFVF_DIFFUSE|D3DFVF_TEX1)
+#define VTX_NUM2D		(4)		// 頂点数
+#define DIVISION_SIZE	(8)		// 分割数
 
 //*****************************************************************************
 // 構造体定義
@@ -23,20 +25,20 @@ typedef struct
 	D3DXVECTOR2 tex;//テクスチャ座標
 } VERTEX_2D;
 
-//------------------------------------------------------------------------------
+//*****************************************************************************
 // クラスの定義
-//------------------------------------------------------------------------------
+//*****************************************************************************
 class CScene2D : public CScene
 {
 public:
-	CScene2D(OBJTYPE nPriority = OBJTYPE_NONE);
+	CScene2D(OBJTYPE nPriority = OBJTYPE_POLYGON);
 	~CScene2D();
 
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-	static CScene2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, CTexture::Type texture = CTexture::Prov,CScene::OBJTYPE objtype = CScene::OBJTYPE_NONE);
+	static CScene2D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, CTexture::Type texture = CTexture::Prov,CScene::OBJTYPE objtype = CScene::OBJTYPE_POLYGON);
 
 	//------------------------------------------------------------------------------
 	// Setter
@@ -44,7 +46,7 @@ public:
 	void SetScalePos(D3DXVECTOR3 pos, D3DXVECTOR3 scale);
 	void SetPos(D3DXVECTOR3 vtx0, D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3);	
 	void SetPos(D3DXVECTOR3 pos, D3DXVECTOR3 scale,bool bScroll = true);
-	void SetPos(D3DXVECTOR3 pos, D3DXVECTOR3 scale, D3DXVECTOR3 Rotvtx0, D3DXVECTOR3 Rotvtx1, D3DXVECTOR3 Rotvtx2, D3DXVECTOR3 Rotvtx3);
+	void SetPos(D3DXVECTOR3 pos, D3DXVECTOR3 scale, D3DXVECTOR3 *Rotvtx);
 
 	void SetTex(int nAnim,int nPartU);															// テクスチャの取得
 	void SetTex(float fSpeedX, float fSpeedY);													// テクスチャの設定

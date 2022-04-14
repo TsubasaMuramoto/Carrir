@@ -3,15 +3,14 @@
 //================================================
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
-#include "renderer.h"
 #include "score.h"
 #include "manager.h"
 #include "ranking.h"
-#include "scene.h"
 #include "play_data.h"
 #include "number.h"
 #include "result.h"
 #include "texture.h"
+#include "keyboard.h"
 
 //================================================
 //静的メンバ変数宣言
@@ -32,8 +31,7 @@ CRanking::CRanking()
 	m_col.g = 0.0f;
 	m_col.b = 0.0f;
 	m_col.a = 0.0f;
-
-	//memset(&m_apUi, NULL, sizeof(m_apUi));
+	m_bClear = false;
 }
 
 //================================================
@@ -101,25 +99,25 @@ HRESULT CRanking::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 		}
 	}
 
-	//ロード処理
+	// ロード処理
 	FILE *pFile;
-	pFile = fopen("data/ranking.txt", "r");
-	if (pFile != NULL)
+	if (nullptr == (pFile = fopen("data/ranking.txt", "r")))	// ファイルを開く(読み込みモード)
+	{
+		printf("ファイルが開けませんでした\n");
+		exit(EXIT_FAILURE);
+	}
+
+	else
 	{
 		for (int nCntRanking = 0; nCntRanking < MAX_RANKING; nCntRanking++)
 		{
 			fscanf(pFile, "%d", &m_nScore[nCntRanking]);
 		}
 	}
-	else
-	{
-		printf("ファイルが開けませんでした\n");
-	}
 	fclose(pFile);
 
 	//プレイデータの取得
-	CPlayData *pPlayData = NULL;
-	pPlayData = CManager::GetPlayData();
+	CPlayData *pPlayData = CManager::GetPlayData();
 
 	//プレイデータに保存してある今回のスコアを変数に保存
 	m_nScore[MAX_SCORE_DATA - 1] = pPlayData->GetScore();
@@ -150,22 +148,23 @@ HRESULT CRanking::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 	}
 
 	//セーブ処理
-	pFile = fopen("data/ranking.txt", "w");
+	if (nullptr == (pFile = fopen("data/ranking.txt", "w")))
+	{
+		printf("ファイルが開けませんでした\n");
+		exit(EXIT_FAILURE);
+	}
 
-	if (pFile != NULL)
+	else
 	{
 		for (int nCntRanking = 0; nCntRanking < MAX_RANKING; nCntRanking++)
 		{
 			fprintf(pFile, "%d\n", m_apScore[nCntRanking]->GetScore());
 		}
 	}
-	else
-	{
-		printf("ファイルが開けませんでした\n");
-	}
+
 	fclose(pFile);
 
-	//カラーの設定
+	// カラーの設定
 	m_col.r = 255.0f;
 	m_col.g = 0.0f;
 	m_col.b = 0.0f;
@@ -175,16 +174,22 @@ HRESULT CRanking::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 }
 
 //================================================
-//終了処理
+// 終了処理
 //================================================
 void CRanking::Uninit(void)
 {
+#ifdef _DEBUG
+	if (m_bClear)
+	{
+		ClearZeroRank();
+	}
+#endif
+
 	for (int nCntRanking = 0; nCntRanking < MAX_RANKING; nCntRanking++)
 	{
 		if (m_apScene2D[nCntRanking] != nullptr)
 		{
 			m_apScene2D[nCntRanking]->Uninit();
-			delete m_apScene2D[nCntRanking];
 			m_apScene2D[nCntRanking] = nullptr;
 		}
 	}
@@ -194,7 +199,6 @@ void CRanking::Uninit(void)
 		if (m_apScore[nCntRanking] != nullptr)
 		{
 			m_apScore[nCntRanking]->Uninit();
-			delete m_apScore[nCntRanking];
 			m_apScore[nCntRanking] = nullptr;
 		}
 	}
@@ -203,7 +207,7 @@ void CRanking::Uninit(void)
 }
 
 //================================================
-//更新処理
+// 更新処理
 //================================================
 void CRanking::Update(void)
 {
@@ -211,7 +215,6 @@ void CRanking::Update(void)
 	{
 		//スコアの位置取得処理
 		D3DXVECTOR3 posScore = m_apScore[nCntRanking]->GetPos();
-
 
 		if (posScore.x > SCREEN_WIDTH / 2.0f)
 		{
@@ -271,11 +274,18 @@ void CRanking::Update(void)
 			{
 				//ナンバーを取得してカラーを設定
 				m_apScore[nCntRanking]->GetNumber(nCntNumber)->SetCol(m_col);
-				//m_apUi[nCntRanking]->SetCol(m_col);
 			}
 			break;
 		}
 	}
+
+#ifdef _DEBUG
+	CInputkeyboard *pKey = CManager::GetKeyboard();
+	if (pKey->GetTrigger(DIK_R))
+	{
+		m_bClear = true;
+	}
+#endif
 }
 
 //================================================
@@ -303,3 +313,31 @@ CRanking* CRanking::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 	}
 	return pRanking;
 }
+
+//================================================
+// スコア0クリア処理(デバッグのみ)
+//================================================
+#ifdef _DEBUG
+void CRanking::ClearZeroRank()
+{
+	// ファイル構造体
+	FILE *pFile = nullptr;
+
+	if (pFile == nullptr)
+	{
+		if (nullptr != (pFile = fopen("data/ranking.txt", "w")))	// ファイルを開く(書き出しモード)
+		{
+			printf("ファイルが開けませんでした\n");
+		}
+
+		else
+		{
+			for (int nCnt = 0; nCnt < MAX_RANKING; nCnt++)
+			{
+				fprintf(pFile, "%d\n", 0);							// ファイルに0を書き込む
+			}		
+		}
+		fclose(pFile);	// ファイルを閉じる
+	}
+}
+#endif

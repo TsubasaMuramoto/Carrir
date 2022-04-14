@@ -15,8 +15,6 @@
 //--------------------------------------
 // 前方宣言
 //--------------------------------------
-class CBg;
-class CPolygon;
 class CRanking;
 
 //--------------------------------------
@@ -25,16 +23,6 @@ class CRanking;
 class CResult
 {
 public:
-
-	//--------------------------------------
-	// 選択肢構造体
-	//--------------------------------------
-	typedef enum
-	{
-		GAME_RETRY = 0,
-		TITLE,
-		MAX,
-	}TYPE;
 
 	//--------------------------------------
 	// メソッド
@@ -48,12 +36,8 @@ public:
 	void NextMode(bool bNextMode) { m_bNextMode = bNextMode; }
 
 private:
-	CPolygon			*pPolygon[MAX_RESULT];			// ポリゴンクラス(選択肢を表示)
-	CPolygon			*m_Cursol;						// ポリゴンクラス(カーソルを表示)
 	CRanking			*m_pRanking;					// ランキングのポインタ
-
 	bool				m_bNextMode;					// 次のモードに行くためのbool変数
-	int					m_nSelectType;					// 現在の選択
 
 };
 

@@ -25,12 +25,12 @@ CScene::CScene()
 CScene::CScene(OBJTYPE nPriority)
 {
 	//トップがNULLだったら先頭オブジェクト
-	if (m_pTop[nPriority] == NULL)
+	if (m_pTop[nPriority] == nullptr)
 	{
 		m_pTop[nPriority] = this;
 		m_pCur[nPriority] = this;
-		m_pPrev = NULL;
-		m_pNext = NULL;
+		m_pPrev = nullptr;
+		m_pNext = nullptr;
 		m_bDamage = false;
 
 	}
@@ -41,7 +41,7 @@ CScene::CScene(OBJTYPE nPriority)
 		m_pCur[nPriority]->m_pNext = this;	//前のオブジェクトの次は自分
 		m_pPrev = m_pCur[nPriority];		//自分の前のオブジェクトを代入
 		m_pCur[nPriority] = this;			//現在のオブジェクトを自分にする
-		m_pNext = NULL;
+		m_pNext = nullptr;
 		m_bDamage = false;
 	}
 
@@ -56,23 +56,23 @@ CScene::CScene(OBJTYPE nPriority)
 //=============================================================================
 CScene::~CScene()
 {
-	//ココのオブジェクトが生成されていたら
+	// ココのオブジェクトが生成されていたら
 	if (this == m_pTop[m_nPriority] && this == m_pCur[m_nPriority])
 	{
-		m_pTop[m_nPriority] = NULL;
-		m_pCur[m_nPriority] = NULL;
-		m_pNext = NULL;
-		m_pPrev = NULL;
+		m_pTop[m_nPriority] = nullptr;
+		m_pCur[m_nPriority] = nullptr;
+		m_pNext = nullptr;
+		m_pPrev = nullptr;
 	}
 	else if (this == m_pTop[m_nPriority])
 	{
-		m_pNext->m_pPrev = NULL;
+		m_pNext->m_pPrev = nullptr;
 		m_pTop[m_nPriority] = m_pNext;
 
 	}
 	else if (this == m_pCur[m_nPriority])
 	{
-		m_pPrev->m_pNext = NULL;
+		m_pPrev->m_pNext = nullptr;
 		m_pCur[m_nPriority] = m_pPrev;
 
 	}
@@ -92,13 +92,13 @@ void CScene::UpdateAll(void)
 {
 	for (int nObj = 0; nObj < OBJTYPE_MAX; nObj++)
 	{
-		if (CManager::GetPause() == false)						// ポーズ状態がfalseなら
+		if (!CManager::GetPause())						// ポーズ状態がfalseなら
 		{
-			if (m_pTop[nObj] != NULL)
+			if (m_pTop[nObj] != nullptr)
 			{
 				CScene *m_pUpdate = m_pTop[nObj];				// 次に更新するオブジェクトの格納
 
-				while (m_pUpdate != NULL)						// m_pUpdateにNULLが入るまで
+				while (m_pUpdate != nullptr)						// m_pUpdateにNULLが入るまで
 				{
 					m_pUpdate->Update();
 					m_pUpdate = m_pUpdate->m_pNext;
@@ -111,13 +111,13 @@ void CScene::UpdateAll(void)
 		{
 			if (nObj == OBJTYPE_PAUSE || nObj == OBJTYPE_UI || nObj == OBJTYPE_FADE)	// オブジェクトがフェードorUIorポーズなら
 			{
-				if (m_pTop[nObj] != NULL)
+				if (m_pTop[nObj] != nullptr)
 				{
-					CScene *m_pUpdate = m_pTop[nObj];				// 次に更新するオブジェクトの格納
+					CScene *m_pUpdate = m_pTop[nObj];					// 次に更新するオブジェクトの格納
 
-					while (m_pUpdate != NULL)						// m_pUpdateにNULLが入るまで
+					while (m_pUpdate != nullptr)						// m_pUpdateにNULLが入るまで
 					{
-						if (m_pUpdate->m_bDeath == false)
+						if (!m_pUpdate->m_bDeath)
 						{
 							m_pUpdate->Update();
 						}
@@ -132,7 +132,7 @@ void CScene::UpdateAll(void)
 	for (int nObj = 0; nObj < OBJTYPE_MAX; nObj++)
 	{
 		CScene *m_pUpdate = m_pTop[nObj];				// 次に更新するオブジェクトの格納
-		CScene *m_pDeleteUpdate = NULL;					// 次に更新するオブジェクトの格納
+		CScene *m_pDeleteUpdate = nullptr;					// 次に更新するオブジェクトの格納
 
 		// オブジェクトがNULLになるまで
 		while (m_pUpdate)
@@ -141,11 +141,11 @@ void CScene::UpdateAll(void)
 			m_pDeleteUpdate = m_pUpdate->m_pNext;
 
 			// 死亡フラグが立っていたら
-			if (m_pUpdate->m_bDeath == true)
+			if (m_pUpdate->m_bDeath)
 			{
 				//消す
 				delete m_pUpdate;
-				m_pUpdate = NULL;
+				m_pUpdate = nullptr;
 			}
 
 			// 次のオブジェクトにする
@@ -161,14 +161,14 @@ void CScene::DrawAll(void)
 {
 	for (int nObj = 0; nObj < OBJTYPE_MAX; nObj++)
 	{
-		if (m_pTop[nObj] != NULL)
+		if (m_pTop[nObj] != nullptr)
 		{
 			CScene *m_pDraw = m_pTop[nObj];				// 次に描画するオブジェクトの格納
 
 			// m_pDrawにNULLが入るまで
 			while (m_pDraw)
 			{
-				if (m_pDraw->m_bDeath == false)
+				if (!m_pDraw->m_bDeath)
 				{
 					m_pDraw->Draw();
 				}
@@ -181,7 +181,7 @@ void CScene::DrawAll(void)
 	for (int nObj = 0; nObj < OBJTYPE_MAX; nObj++)
 	{
 		CScene *m_pDraw = m_pTop[nObj];				// 次に更新するオブジェクトの格納
-		CScene *m_pDeleteDraw = NULL;				// 次に更新するオブジェクトの格納
+		CScene *m_pDeleteDraw = nullptr;				// 次に更新するオブジェクトの格納
 
 		while (m_pDraw)
 		{
@@ -189,11 +189,11 @@ void CScene::DrawAll(void)
 			m_pDeleteDraw = m_pDraw->m_pNext;
 
 			// 死亡フラグが立っていたら
-			if (m_pDraw->m_bDeath == true)
+			if (m_pDraw->m_bDeath)
 			{
 				// 消す
 				delete m_pDraw;
-				m_pDraw = NULL;
+				m_pDraw = nullptr;
 			}
 
 			// 次のオブジェクトにする
@@ -213,7 +213,7 @@ void CScene::ReleaseAll(void)
 
 			//最後のオブジェクトの次のNextがNULLでなかったら
 			//無限ループ
-			while (pScene != NULL)
+			while (pScene != nullptr)
 			{
 				//トップの次のオブジェクトを格納
 				CScene *pDeletePrev = pScene->m_pNext;
@@ -222,7 +222,7 @@ void CScene::ReleaseAll(void)
 				{
 					//トップの情報を消す
 					delete pScene;
-					pScene = NULL;
+					pScene = nullptr;
 				}
 
 				//トップの情報を次のオブジェクトにする

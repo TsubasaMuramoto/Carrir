@@ -7,7 +7,6 @@
 #include "player.h"
 #include "manager.h"
 #include "renderer.h"
-#include "scene.h"
 #include "scene2D.h"
 #include "keyboard.h"
 #include "bullet.h"
@@ -16,6 +15,8 @@
 #include "XInput.h"
 #include "bg.h"
 #include "game.h"
+#include "sound.h"
+#include <assert.h>
 
 //=============================================================================
 // 静的メンバ変数の初期化
@@ -34,7 +35,7 @@ CPlayer::CPlayer(OBJTYPE nPriority) : CScene2D(nPriority)
 	m_velocity			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 実際の速度
 	m_Direction			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 向き
 	m_Speed				= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 速度
-	m_fMaxSpeed			= 0.0f;								// 最大速度
+	m_fMaxSpeed			= MAX_SPEED;						// 最大速度
 	m_fAngle			= 0.0f;								// 角度
 	m_fShootInterval	= 0.0f;								// 射撃間隔
 	m_RotateVertex[0]	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -97,10 +98,11 @@ void CPlayer::Uninit(void)
 void CPlayer::Update(void)
 {
 	CXInput *pGamePad = CManager::GetXInput();
+	CMouse *pMouse = CManager::GetMouse();
 
 	CScene2D::Update();
 	CScene::SetMove(m_Speed);
-	CScene2D::SetPos(m_pos,m_scale,m_RotateVertex[0],m_RotateVertex[1],m_RotateVertex[2],m_RotateVertex[3]);
+	CScene2D::SetPos(m_pos,m_scale,&m_RotateVertex[0]);
 	Move();		// プレイヤーの移動
 
 	//==========================================================================================================
@@ -108,26 +110,18 @@ void CPlayer::Update(void)
 	//==========================================================================================================
 	if (m_fShootInterval > 0.0f)
 	{
-		m_fShootInterval -= 0.1f;	// 次に弾が打てるまでのインターバルを減らす
-
-		
-		pGamePad->m_GamePad.m_vibration.wLeftMotorSpeed = 0;
-		pGamePad->m_GamePad.m_vibration.wRightMotorSpeed = 0;
-		XInputSetState(0, &pGamePad->m_GamePad.m_vibration);
+		m_fShootInterval -= 0.1f;		// 次に弾が打てるまでのインターバルを減らす
+		pGamePad->SetVibration(0,0);	// 振動停止
 	}
 
 	else
 	{
 		// マウスクリックorゲームパッドR2
-		if (CManager::GetMouse()->GetPress(CMouse::MOUSE_LEFT) || pGamePad->GetGamePad()->m_state.Gamepad.bRightTrigger >= XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
+		if (pMouse->GetPress(pMouse->MOUSE_LEFT) || pGamePad->GetGamePad()->m_state.Gamepad.bRightTrigger >= XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
 		{
-			CBullet::Create(m_pos, D3DXVECTOR3(20.0f, 20.0f, 0.0f), m_fAngle);	// 弾を生成
-			m_fShootInterval = 0.5f;											// 弾のインターバルを設定する
-
-			// 振動させる
-			pGamePad->m_GamePad.m_vibration.wLeftMotorSpeed = VIBRATION_POWER_MAX;
-			pGamePad->m_GamePad.m_vibration.wRightMotorSpeed = VIBRATION_POWER_MAX;
-			XInputSetState(0, &pGamePad->m_GamePad.m_vibration);
+			CBullet::Create(m_pos, BULLET_SIZE, m_fAngle);						// 弾を生成
+			m_fShootInterval = SHOOT_INTERVAL;									// 弾のインターバルを設定する
+			pGamePad->SetVibration(VIBRATION_POWER_MAX, VIBRATION_POWER_MAX);	// コントローラ振動
 		}
 	}
 }
@@ -137,7 +131,7 @@ void CPlayer::Update(void)
 //=============================================================================
 void CPlayer::Draw(void)
 {
-	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();//デバイスのポインタ
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();	// デバイスのポインタ
 
 	// アルファブレンド
 	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
@@ -155,23 +149,23 @@ void CPlayer::Draw(void)
 CPlayer *CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, CTexture::Type texture)
 {
 	// インスタンス生成
-	CPlayer *pPlayer = new CPlayer(OBJTYPE_PLAYER);
+	CPlayer *pPlayer = nullptr;
 
-	// プレイヤー情報の取得
-	pPlayer->m_pos = pos;
-	pPlayer->m_scale = scale;
-	pPlayer->m_Tex = texture;
-	pPlayer->m_Direction = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	pPlayer->m_fMaxSpeed = 10.0f;
-	pPlayer->m_Speed = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	//pPlayer->m_fShootInterval = 0.5f;
-
-	if (pPlayer != NULL)
+	if (pPlayer == nullptr)
 	{
-		// 初期化処理
-		pPlayer->Init();
-	}
+		pPlayer = new CPlayer(OBJTYPE_PLAYER);
 
+		if (pPlayer != nullptr)
+		{
+			// プレイヤー情報の取得
+			pPlayer->m_pos = pos;
+			pPlayer->m_scale = scale;
+			pPlayer->m_Tex = texture;
+
+			// 初期化処理
+			pPlayer->Init();
+		}
+	}
 	return pPlayer;
 }
 
@@ -180,65 +174,58 @@ CPlayer *CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, CTexture::Type text
 //=============================================================================
 void CPlayer::Move(void)
 {
-	CXInput *pGamePad = CManager::GetXInput();
-
 	// ゲームパッドが接続されているか
+	CXInput *pXInput = CManager::GetXInput();
 	XINPUT_STATE state;
 	DWORD IsConnected = XInputGetState(0, &state);
 	if (IsConnected == ERROR_SUCCESS)
 	{
-		m_fAngle = RotateGamePad(pGamePad);						// ゲームパッド入力での角度を求める処理
+		m_fAngle = RotateGamePad(pXInput);			// ゲームパッド入力での角度を求める処理
 	}
 	else
 	{
-		m_fAngle = FeaturedMouse(m_pos, m_Point);				// マウスカーソルにプレイヤーが向く処理
+		m_fAngle = FeaturedMouse(m_pos, m_Point);	// マウスカーソルにプレイヤーが向く処理
 	}
 
 	//=============================================================================
 	// プレイヤーの移動を決める
 	//=============================================================================
 	// 前に進む
-	if (CManager::GetKeyboard()->GetPress(DIK_W) == true || pGamePad->GetGamePad()->m_state.Gamepad.sThumbLY >= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+	if (InputDirection(DIRECTION_UP))
 	{
 		m_Direction.y = 1.0f;
 		m_Speed.y -= 0.2f;
 	}
 
 	// 後ろに進む
-	else if (CManager::GetKeyboard()->GetPress(DIK_S) == true || pGamePad->GetGamePad()->m_state.Gamepad.sThumbLY <= -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+	else if (InputDirection(DIRECTION_DOWN))
 	{
 		m_Direction.y = 1.0f;
 		m_Speed.y += 0.2f;
 	}
 
 	// 前後押していない状態
-	else if ((CManager::GetKeyboard()->GetPress(DIK_W) == false && 
-			  CManager::GetKeyboard()->GetPress(DIK_S) == false) || 
-			 (pGamePad->GetGamePad()->m_state.Gamepad.sThumbLY < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE && 
-			  pGamePad->GetGamePad()->m_state.Gamepad.sThumbLY > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE))
+	else if (InputDirection(DIRECTION_NO_UP) && InputDirection(DIRECTION_NO_DOWN))
 	{
 		m_Direction.y = 0.0f;
 	}
 
 	// 右に進む
-	if (CManager::GetKeyboard()->GetPress(DIK_D) == true || pGamePad->GetGamePad()->m_state.Gamepad.sThumbLX >= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+	if (InputDirection(DIRECTION_RIGHT))
 	{
 		m_Direction.x = 1.0f;
 		m_Speed.x += 0.2f;
 	}
 
 	// 左に進む
-	else if (CManager::GetKeyboard()->GetPress(DIK_A) == true ||  pGamePad->GetGamePad()->m_state.Gamepad.sThumbLX <= -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+	else if (InputDirection(DIRECTION_LEFT))
 	{
 		m_Direction.x = -1.0f;
 		m_Speed.x -= 0.2f;
 	}
 
 	// 左右押していない状態
-	else if ((CManager::GetKeyboard()->GetPress(DIK_A) == false &&
-			  CManager::GetKeyboard()->GetPress(DIK_D) == false) ||
-			 (pGamePad->GetGamePad()->m_state.Gamepad.sThumbLX < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
-			  pGamePad->GetGamePad()->m_state.Gamepad.sThumbLX > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE))
+	else if (InputDirection(DIRECTION_NO_LEFT) && InputDirection(DIRECTION_NO_RIGHT))
 	{
 		m_Direction.x = 0.0f;
 	}
@@ -252,18 +239,11 @@ void CPlayer::Move(void)
 	//==========================================================================================================
 	// エフェクト生成とモーター振動
 	//==========================================================================================================
-	if (CManager::GetKeyboard()->GetPress(DIK_W) == true || CManager::GetKeyboard()->GetPress(DIK_S) == true ||
-		CManager::GetKeyboard()->GetPress(DIK_A) == true || CManager::GetKeyboard()->GetPress(DIK_D) == true ||
-		pGamePad->GetGamePad()->m_state.Gamepad.sThumbLX >= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ||
-		pGamePad->GetGamePad()->m_state.Gamepad.sThumbLX <= -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ||
-		pGamePad->GetGamePad()->m_state.Gamepad.sThumbLY <= -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ||
-		pGamePad->GetGamePad()->m_state.Gamepad.sThumbLY >= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE
-		)
+	if (InputDirection(DIRECTION_UP) || InputDirection(DIRECTION_DOWN) ||
+		InputDirection(DIRECTION_LEFT) || InputDirection(DIRECTION_RIGHT))
 	{
 		// 振動させる
-		pGamePad->m_GamePad.m_vibration.wLeftMotorSpeed = VIBRATION_POWER_LEFT;
-		pGamePad->m_GamePad.m_vibration.wRightMotorSpeed = VIBRATION_POWER_RIGHT;
-		XInputSetState(0, &pGamePad->m_GamePad.m_vibration);
+		pXInput->SetVibration(VIBRATION_POWER_RIGHT, VIBRATION_POWER_LEFT);
 
 		// エフェクト生成
 		CEffect::Create(m_pos, m_Speed, m_scale, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 0.5f,0.01f, m_fAngle,CEffect::EFFECT_PLAYER);
@@ -272,9 +252,7 @@ void CPlayer::Move(void)
 	else
 	{
 		// モーターの力を0にする(振動を停止)
-		pGamePad->m_GamePad.m_vibration.wLeftMotorSpeed = 0;
-		pGamePad->m_GamePad.m_vibration.wRightMotorSpeed = 0;
-		XInputSetState(0, &pGamePad->m_GamePad.m_vibration);
+		pXInput->SetVibration(0, 0);
 	}
 
 	//==========================================================================================================
@@ -286,36 +264,14 @@ void CPlayer::Move(void)
 	Rotate(m_pos, m_scale, m_fAngle);						// 回転
 	MovingLimit(m_pos, m_scale, m_Speed);					// 移動限界
 
-	/*float length = 0.0f;
-	float normal_x = 0.0f;
-	float normal_y = 0.0f;*/
-	//---------------------------------------------------------------------------------------------
-	// 斜め移動を正確にする
-	//---------------------------------------------------------------------------------------------
-		//// 加速度になにか数値が入っていた場合
-		//if (m_velocity.x != 0.0f || m_velocity.y != 0.0f)
-		//{
-		//	// xの速度とyの速度から斜めの速度を求める
-		//	length = sqrt(m_velocity.x * m_velocity.x + m_velocity.y * m_velocity.y);
-		//	// それぞれの長さを斜めの長さで割ってあげる
-		//	normal_x = m_velocity.x / length;
-		//	normal_y = m_velocity.y / length;
-		//	//	速度をかける
-		//	normal_x *= m_fSpeed.x;
-		//	normal_y *= m_fSpeed.y;
-		//	// 移動する(座標更新)
-		//	m_pos.x += normal_x;
-		//	m_pos.y += normal_y;
-		//}
-
 }
 
 //=============================================================================
 // プレイヤーの慣性
 //=============================================================================
-void CPlayer::Acceleration(D3DXVECTOR3& vec, D3DXVECTOR3 speed, float Maxspeed)
+void CPlayer::Acceleration(D3DXVECTOR3& velo, D3DXVECTOR3& speed,const float &Maxspeed)
 {
-	m_velocity = vec;
+	m_velocity = velo;
 	m_Speed = speed;
 	m_fMaxSpeed = Maxspeed;
 
@@ -327,7 +283,7 @@ void CPlayer::Acceleration(D3DXVECTOR3& vec, D3DXVECTOR3 speed, float Maxspeed)
 		// 0に戻り続ける処理
 		if (m_Speed.x > 0.0f)
 		{
-			m_Speed.x -= 0.2f;
+			m_Speed.x -= INERTIA_SPEED;
 
 			if (m_Speed.x <= 0.0f)
 			{
@@ -337,7 +293,7 @@ void CPlayer::Acceleration(D3DXVECTOR3& vec, D3DXVECTOR3 speed, float Maxspeed)
 
 		else if (m_Speed.x < 0.0f)
 		{
-			m_Speed.x += 0.2f;
+			m_Speed.x += INERTIA_SPEED;
 
 			if (m_Speed.x >= 0.0f)
 			{
@@ -354,7 +310,7 @@ void CPlayer::Acceleration(D3DXVECTOR3& vec, D3DXVECTOR3 speed, float Maxspeed)
 		// 0に戻り続ける処理
 		if (m_Speed.y > 0.0f)
 		{
-			m_Speed.y -= 0.2f;
+			m_Speed.y -= INERTIA_SPEED;
 
 			if (m_Speed.y <= 0.0f)
 			{
@@ -364,7 +320,7 @@ void CPlayer::Acceleration(D3DXVECTOR3& vec, D3DXVECTOR3 speed, float Maxspeed)
 
 		else if (m_Speed.y < 0.0f)
 		{
-			m_Speed.y += 0.2f;
+			m_Speed.y += INERTIA_SPEED;
 
 			if (m_Speed.y >= 0.0f)
 			{
@@ -381,7 +337,7 @@ void CPlayer::Acceleration(D3DXVECTOR3& vec, D3DXVECTOR3 speed, float Maxspeed)
 		m_Speed.x = m_fMaxSpeed;
 	}
 
-	if (m_Speed.x <= -m_fMaxSpeed)
+	else if (m_Speed.x <= -m_fMaxSpeed)
 	{
 		m_Speed.x = -m_fMaxSpeed;
 	}
@@ -391,7 +347,7 @@ void CPlayer::Acceleration(D3DXVECTOR3& vec, D3DXVECTOR3 speed, float Maxspeed)
 		m_Speed.y = m_fMaxSpeed;
 	}
 
-	if (m_Speed.y <= -m_fMaxSpeed)
+	else if (m_Speed.y <= -m_fMaxSpeed)
 	{
 		m_Speed.y = -m_fMaxSpeed;
 	}
@@ -407,13 +363,13 @@ void CPlayer::Rotate(D3DXVECTOR3 pos, D3DXVECTOR3 scale, float Angle)
 {
 	D3DXVECTOR3 vertex[4];
 
-	// 4頂点の取得
+	// 4頂点の設定
 	vertex[0] = D3DXVECTOR3(-scale.x / 2, -scale.y / 2, 0.0f);
 	vertex[1] = D3DXVECTOR3(+scale.x / 2, -scale.y / 2, 0.0f);
 	vertex[2] = D3DXVECTOR3(-scale.x / 2, +scale.y / 2, 0.0f);
 	vertex[3] = D3DXVECTOR3(+scale.x / 2, +scale.y / 2, 0.0f);
 	
-	for (int nCnt = 0; nCnt < 4; nCnt++)
+	for (int nCnt = 0; nCnt < VTX_NUM2D; nCnt++)
 	{
 		float x = vertex[nCnt].x;
 		float y = vertex[nCnt].y;
@@ -443,7 +399,7 @@ void CPlayer::MovingLimit(D3DXVECTOR3 &pos, D3DXVECTOR3 &scale, D3DXVECTOR3 &spe
 					speed.x = 0.0f;
 				}
 
-				CGame::SetScroll("noX", speed);
+				CGame::SetScroll("StopX", speed);
 			}
 
 			else
@@ -465,7 +421,7 @@ void CPlayer::MovingLimit(D3DXVECTOR3 &pos, D3DXVECTOR3 &scale, D3DXVECTOR3 &spe
 					speed.x = 0.0f;
 				}
 
-				CGame::SetScroll("noX", speed);
+				CGame::SetScroll("StopX", speed);
 			}
 
 			else
@@ -478,7 +434,7 @@ void CPlayer::MovingLimit(D3DXVECTOR3 &pos, D3DXVECTOR3 &scale, D3DXVECTOR3 &spe
 
 	else
 	{
-		CGame::SetScroll("noX", speed);						// 横スクロールをストップ
+		CGame::SetScroll("StopX", speed);						// 横スクロールをストップ
 	}
 
 	// スクロールし始める範囲(縦)
@@ -496,7 +452,7 @@ void CPlayer::MovingLimit(D3DXVECTOR3 &pos, D3DXVECTOR3 &scale, D3DXVECTOR3 &spe
 					speed.y = 0.0f;
 				}
 
-				CGame::SetScroll("noY", speed);
+				CGame::SetScroll("StopY", speed);
 			}
 
 			else
@@ -518,7 +474,7 @@ void CPlayer::MovingLimit(D3DXVECTOR3 &pos, D3DXVECTOR3 &scale, D3DXVECTOR3 &spe
 					speed.y = 0.0f;
 				}
 
-				CGame::SetScroll("noY", speed);
+				CGame::SetScroll("StopY", speed);
 			}
 
 			else
@@ -531,7 +487,7 @@ void CPlayer::MovingLimit(D3DXVECTOR3 &pos, D3DXVECTOR3 &scale, D3DXVECTOR3 &spe
 
 	else
 	{
-		CGame::SetScroll("noY", speed);			// 縦スクロールをストップ
+		CGame::SetScroll("StopY", speed);			// 縦スクロールをストップ
 	}
 
 }
@@ -542,11 +498,11 @@ void CPlayer::MovingLimit(D3DXVECTOR3 &pos, D3DXVECTOR3 &scale, D3DXVECTOR3 &spe
 float CPlayer::FeaturedMouse(D3DXVECTOR3 pos, POINT mousePoint)
 {
 	// オブジェクトの位置とマウスカーソルの位置の差分を求める
-	float fLengthX = (pos.x - mousePoint.x);
-	float fLengthY = (pos.y - mousePoint.y);
+	const float fLengthX = (pos.x - mousePoint.x);
+	const float fLengthY = (pos.y - mousePoint.y);
 
 	// 角度を求める(XYを逆にして引数に入れると↑から0度になる)
-	float fAngle = (float)-atan2(fLengthX, fLengthY);
+	const float fAngle = -atan2f(fLengthX, fLengthY);
 
 	return fAngle;
 }
@@ -554,29 +510,69 @@ float CPlayer::FeaturedMouse(D3DXVECTOR3 pos, POINT mousePoint)
 //=============================================================================
 // ゲームパッドで回転を行う関数
 //=============================================================================
-float CPlayer::RotateGamePad(CXInput *pGamePad)
+float CPlayer::RotateGamePad(CXInput *pXInput)
 {
-	if (pGamePad->GetGamePad()->m_state.Gamepad.sThumbRX >= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ||
-		pGamePad->GetGamePad()->m_state.Gamepad.sThumbRX <= -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ||
-		pGamePad->GetGamePad()->m_state.Gamepad.sThumbRY >= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ||
-		pGamePad->GetGamePad()->m_state.Gamepad.sThumbRY <= -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
+	if (pXInput->GetGamePad()->m_state.Gamepad.sThumbRX >= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ||
+		pXInput->GetGamePad()->m_state.Gamepad.sThumbRX <= -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ||
+		pXInput->GetGamePad()->m_state.Gamepad.sThumbRY >= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ||
+		pXInput->GetGamePad()->m_state.Gamepad.sThumbRY <= -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
 	{
-		float RX = pGamePad->GetGamePad()->m_state.Gamepad.sThumbRX;
-		float RY = pGamePad->GetGamePad()->m_state.Gamepad.sThumbRY;
+		const float RX = pXInput->GetGamePad()->m_state.Gamepad.sThumbRX;
+		const float RY = pXInput->GetGamePad()->m_state.Gamepad.sThumbRY;
 
-		float magnitude = sqrtf(RX*RX + RY*RY);
+		const float magnitude = sqrtf(RX*RX + RY*RY);
 
-		float normalizedRX = RX / magnitude;
-		float normalizedRY = RY / magnitude;
+		const float normalizedRX = RX / magnitude;
+		const float normalizedRY = RY / magnitude;
 
 		// 角度を求める(XYを逆にして引数に入れると↑から0度になる)
-		float fAngle = (float)atan2(normalizedRX, normalizedRY);
+		const float fAngle = atan2f(normalizedRX, normalizedRY);
 		return fAngle;
 	}
 
 	else
 	{
 		return m_fAngle;
+	}
+}
+
+//=============================================================================
+// 入力方向
+//=============================================================================
+bool CPlayer::InputDirection(const MOVE_DIRECTION &moveDir)
+{
+	CXInput *pXInput = CManager::GetXInput();
+	CInputkeyboard *pKey = CManager::GetKeyboard();
+
+	switch (moveDir)
+	{
+	case DIRECTION_UP:
+		return pKey->GetPress(DIK_W) || pXInput->GetGamePad()->m_state.Gamepad.sThumbLY >= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+
+	case DIRECTION_DOWN:
+		return pKey->GetPress(DIK_S) || pXInput->GetGamePad()->m_state.Gamepad.sThumbLY <= -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+
+	case DIRECTION_LEFT:
+		return pKey->GetPress(DIK_A) || pXInput->GetGamePad()->m_state.Gamepad.sThumbLX <= -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+
+	case DIRECTION_RIGHT:
+		return pKey->GetPress(DIK_D) || pXInput->GetGamePad()->m_state.Gamepad.sThumbLX >= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+
+	case DIRECTION_NO_UP:
+		return !pKey->GetPress(DIK_W) || pXInput->GetGamePad()->m_state.Gamepad.sThumbLY < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+
+	case DIRECTION_NO_DOWN:
+		return !pKey->GetPress(DIK_S) || pXInput->GetGamePad()->m_state.Gamepad.sThumbLY > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+
+	case DIRECTION_NO_LEFT:
+		return !pKey->GetPress(DIK_A) || pXInput->GetGamePad()->m_state.Gamepad.sThumbLX > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+
+	case DIRECTION_NO_RIGHT:
+		return !pKey->GetPress(DIK_D) || pXInput->GetGamePad()->m_state.Gamepad.sThumbLX < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+
+	default:
+		assert(moveDir <= -1 || moveDir >= DIRECTION_MAX);
+		return false;
 	}
 }
 

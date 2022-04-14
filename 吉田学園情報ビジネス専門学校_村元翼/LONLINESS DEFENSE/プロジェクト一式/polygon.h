@@ -11,6 +11,8 @@
 //=============================================================================
 // マクロ定義
 //=============================================================================
+#define MINIMAP_POS		(D3DXVECTOR3(SCREEN_WIDTH - (SCREEN_WIDTH / DIVISION_SIZE), SCREEN_HEIGHT / DIVISION_SIZE, 0.0f))	
+#define MINIMAP_SIZE	(D3DXVECTOR3(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, 0.0f))	
 
 //=============================================================================
 // 前方宣言
