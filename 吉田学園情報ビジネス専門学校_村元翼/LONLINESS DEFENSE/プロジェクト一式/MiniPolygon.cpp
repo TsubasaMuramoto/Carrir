@@ -55,7 +55,7 @@ void CMiniPolygon::Uninit(void)
 //=============================================================================
 void CMiniPolygon::Update(void)
 {
-	if (m_bUse == true)
+	if (m_bUse)
 	{
 		CScene2D::Update();
 

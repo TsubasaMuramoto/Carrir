@@ -56,6 +56,7 @@ CGame::CGame()
 	m_bNextMode		= false;
 	m_ScrollSpeed	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_ScrollPos		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_nSpawnTimer	= 0;
 }
 
 //--------------------------------------------
@@ -148,34 +149,26 @@ void CGame::Uninit(void)
 	if (m_pPlayer != nullptr)
 	{
 		m_pPlayer->Uninit();
-		delete m_pPlayer;
 		m_pPlayer = nullptr;
 	}
-
 	if (m_pBg != nullptr)
 	{
 		m_pBg->Uninit();
-		delete m_pBg;
 		m_pBg = nullptr;
 	}
-
 	if (m_pGauge != nullptr)
 	{
 		m_pGauge->Uninit();
-		delete m_pGauge;
 		m_pGauge = nullptr;
 	}
-
 	if (m_pTime != nullptr)
 	{
 		m_pTime->Uninit();
-		delete m_pTime;
 		m_pTime = nullptr;
 	}
 	if (m_pScore != nullptr)
 	{
 		m_pScore->Uninit();
-		delete m_pScore;
 		m_pScore = nullptr;
 	}
 }
@@ -185,10 +178,10 @@ void CGame::Uninit(void)
 void CGame::Update(void)
 {
 	// 入力デバイスの取得
-	CInputkeyboard *pKey = CManager::GetKeyboard();
-	CXInput *pGamePad = CManager::GetXInput();
+	CInputkeyboard *pKey = CManager::GetInstance()->GetKeyboard();
+	CXInput *pGamePad = CManager::GetInstance()->GetXInput();
 
-	if (!CManager::GetPause())
+	if (!CManager::GetInstance()->GetPause())
 	{
 		//-------------------------------------------------------------------------
 		// 敵のランダム出現処理
@@ -242,6 +235,20 @@ void CGame::Update(void)
 			// タイマーリセット
 			m_nSpawnTimer = 0;
 		}
+
+#ifdef _DEBUG
+		// ENTERまたはSTARTを押す
+		if (pGamePad->GetButtonTrigger(XINPUT_GAMEPAD_START) || pKey->GetTrigger(DIK_RETURN) && !m_bNextMode)
+		{
+			// サウンド再生取得
+			CSound *pSound = CManager::GetInstance()->GetSound();
+			pSound->PlaySound(pSound->SOUND_LABEL_SE_DECIDE);
+
+			CFade::SetFade(CManager::MODE_RESULT);			// ゲームモードへ
+			m_bNextMode = true;								// ENTER連打防止
+		}
+#endif
+
 	}
 }
 //--------------------------------------------

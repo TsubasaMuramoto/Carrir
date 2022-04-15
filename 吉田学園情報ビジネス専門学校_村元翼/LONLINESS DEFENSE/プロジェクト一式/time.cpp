@@ -8,6 +8,7 @@
 #include "time.h"
 #include "fade.h"
 #include "sound.h"
+#include <time.h>
 
 //---------------------------------------------------------------
 // コンストラクタ
@@ -101,18 +102,17 @@ void CTime::Update()
 	}
 
 	// 0秒より低くならないようにする
-	if (m_nTime <= 0 && !m_bNextMode)
+	if (m_nTime <= 0)
 	{
-		// サウンド取得
-		CSound *pSound = CManager::GetSound();
-
-		m_bNextMode = true;
+		if (!m_bNextMode)	// リザルト移行
+		{
+			m_bNextMode = true;
+			CFade::SetFade(CManager::MODE_RESULT);
+		}
 		m_nTime = 0;
-		CFade::SetFade(CManager::MODE_RESULT);
-		pSound->Stop(pSound->SOUND_LABEL_GAME_BGM);
 	}
 
-	SetTime();//描画の設定
+	SetTime();	// 描画の設定
 }
 
 //---------------------------------------------------------------

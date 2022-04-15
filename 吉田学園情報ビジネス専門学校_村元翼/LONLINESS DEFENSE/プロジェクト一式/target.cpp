@@ -32,7 +32,6 @@ CTarget::~CTarget()
 	if (m_pMiniTarget != nullptr)
 	{
 		m_pMiniTarget->Uninit();
-		delete m_pMiniTarget;
 		m_pMiniTarget = nullptr;
 	}
 }

@@ -10,11 +10,16 @@
 // マクロ定義
 //---------------------------------------------------------------
 #define MAX_TIME		(3)											 // 描画するポリゴン枚数
-#define TIME_LIMIT		(60)										 // 制限時間
 #define TIME_REDZONE	(TIME_LIMIT / 3)							 // 制限時間のレッドゾーン
 #define TIME_FRAME		(60)										 // 最大フレーム
 #define TIME_SIZE		(D3DXVECTOR3(50.0f, 50.0f, 0.0f))			 // タイムサイズ
 #define TIME_POS		(D3DXVECTOR3(SCREEN_WIDTH / 2, 40.0f, 0.0f)) // タイム位置
+
+#ifdef _DEBUG
+#define TIME_LIMIT		(10)										 // デバッグ制限時間
+#else
+#define TIME_LIMIT		(60)										 // リリース制限時間
+#endif
 
 //---------------------------------------------------------------
 // 前方宣言

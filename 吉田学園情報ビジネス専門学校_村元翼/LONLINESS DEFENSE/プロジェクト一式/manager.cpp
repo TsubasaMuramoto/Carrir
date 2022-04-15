@@ -24,28 +24,27 @@
 //--------------------------------------
 //静的メンバ変数宣言
 //--------------------------------------
-CRenderer		*CManager::m_pRenderer = nullptr;
-CTexture		*CManager::m_pTexture = nullptr;
-CInputkeyboard	*CManager::m_pKeyboard = nullptr;
-CGame			*CManager::m_pGame = nullptr;
-CTitle			*CManager::m_pTitle = nullptr;
-CTutorial		*CManager::m_pTutorial = nullptr;
-CResult			*CManager::m_pResult = nullptr;
-CFade			*CManager::m_pFade = nullptr;
-CPause			*CManager::m_pPause = nullptr;
-CMouse			*CManager::m_pMouse = nullptr;
-CXInput			*CManager::m_pXInput = nullptr;
-CPlayData		*CManager::m_pPlayData = nullptr;
-CSound			*CManager::m_pSound = nullptr;
-bool			CManager::m_bGamepadSwitch = false;
-bool			CManager::m_bStop = false;
-bool			CManager::m_bPause = false;
+CManager		*CManager::s_pManager		= nullptr;		// シングルトンマネージャ
+CRenderer		*CManager::m_pRenderer		= nullptr;
+CTexture		*CManager::m_pTexture		= nullptr;
+CInputkeyboard	*CManager::m_pKeyboard		= nullptr;
+CGame			*CManager::m_pGame			= nullptr;
+CTitle			*CManager::m_pTitle			= nullptr;
+CTutorial		*CManager::m_pTutorial		= nullptr;
+CResult			*CManager::m_pResult		= nullptr;
+CFade			*CManager::m_pFade			= nullptr;
+CPause			*CManager::m_pPause			= nullptr;
+CMouse			*CManager::m_pMouse			= nullptr;
+CXInput			*CManager::m_pXInput		= nullptr;
+CPlayData		*CManager::m_pPlayData		= nullptr;
+CSound			*CManager::m_pSound			= nullptr;
+bool			CManager::m_bGamepadSwitch	= false;
+bool			CManager::m_bStop			= false;
+bool			CManager::m_bPause			= false;
 
 #ifdef _DEBUG
 CManager::MODE	CManager::m_Mode = MODE_GAME;	// デバッグモード時に通る
-#endif
-
-#ifndef _DEBUG
+#else
 CManager::MODE	CManager::m_Mode = MODE_TITLE;	// リリースモード時に通る
 #endif
 
@@ -227,6 +226,10 @@ void CManager::Uninit(void)
 		delete m_pSound;
 		m_pSound = nullptr;
 	}
+
+	// マネージャの解放
+	delete s_pManager;
+	s_pManager = nullptr;
 }
 //--------------------------------------------
 // 更新
@@ -251,13 +254,11 @@ void CManager::Update(void)
 		m_pMouse->Update();
 	}
 
-
 	// ゲームパッドの更新
 	if (m_pXInput != nullptr)
 	{
 		m_pXInput->UpdateGamepad();
 	}
-
 
 	// モード毎の更新
 	switch (m_Mode)
@@ -282,36 +283,38 @@ void CManager::Update(void)
 			m_pGame->Update();
 
 			// ポーズ切り替え(Pを押す)
-			if (GetKeyboard()->GetTrigger(DIK_P)|| GetXInput()->GetButtonTrigger(XINPUT_GAMEPAD_START))
+			if (m_pKeyboard->GetTrigger(DIK_P) || m_pXInput->GetButtonTrigger(XINPUT_GAMEPAD_START))
 			{
 				m_bStop = !m_bStop;			// ストップを切り替える
-
 				m_bPause = !m_bPause;		// ポーズを切り替える
 			}
 
-			// ストップ状態
-			if (m_bStop)
-			{
-				// コントローラーのバイブレーションと止める
-				m_pXInput->SetVibration(0, 0);
-
-				// ポーズの生成
-				if (m_pPause == nullptr)
+				// ストップ状態
+				if (m_bStop)
 				{
-					m_pPause = CPause::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+					// ポーズの生成
+					if (m_pPause == nullptr)
+					{
+						// コントローラーのバイブレーションと止める
+						m_pXInput->SetVibration(0, 0);
+						m_pSound->PlaySound(m_pSound->SOUND_LABEL_SE_ENTER);
+						m_pPause = CPause::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+					}
 				}
-			}
 
-			else
-			{
-				// ポーズをNULLにする
-				if (m_pPause != nullptr)
+				else
 				{
-					// deleteはSceneで行う
-					m_pPause->Uninit();
-					m_pPause = nullptr;
+					// ポーズをNULLにする
+					if (m_pPause != nullptr)
+					{
+						m_pSound->PlaySound(m_pSound->SOUND_LABEL_SE_CANCEL);
+
+						// deleteはSceneで行う
+						m_pPause->Uninit();
+						m_pPause = nullptr;
+					}
 				}
-			}
+			
 
 		}
 		break;
@@ -373,7 +376,8 @@ void CManager::Draw(void)
 //-----------------------------------------------------------------------------
 void CManager::SetMode(MODE mode)
 {
-	//m_bEnd = false;
+	// サウンド停止
+	m_pSound->Stop();
 
 	// 現在のモードを破棄
 	switch (m_Mode)
@@ -433,6 +437,9 @@ void CManager::SetMode(MODE mode)
 		{
 			m_pTitle = new CTitle;
 			m_pTitle->Init();
+
+			m_pSound->ControllVoice(m_pSound->SOUND_LABEL_BGM_TITLE,0.5f);
+			m_pSound->PlaySound(m_pSound->SOUND_LABEL_BGM_TITLE);
 		}
 		break;
 
@@ -452,17 +459,36 @@ void CManager::SetMode(MODE mode)
 
 			m_pGame = new CGame;
 			m_pGame->Init();
+
+			m_pSound->ControllVoice(m_pSound->SOUND_LABEL_BGM_GAME, 0.5f);
+			m_pSound->PlaySound(m_pSound->SOUND_LABEL_BGM_GAME);
 		}
 		break;
+
 	case MODE_RESULT:		//リザルト画面
 		if (m_pResult == nullptr)
 		{
 			m_pResult = new CResult;
 			m_pResult->Init();
+
+			m_pSound->ControllVoice(m_pSound->SOUND_LABEL_BGM_RESULT, 0.5f);
+			m_pSound->PlaySound(m_pSound->SOUND_LABEL_BGM_RESULT);
 		}
 		break;
 	}
 
-	//次のモードを現在のモードに上書き
+	// 次のモードを現在のモードに上書き
 	m_Mode = mode;
+}
+
+//================================================
+// インスタンス取得処理
+//================================================
+CManager *CManager::GetInstance(void)
+{
+	if (s_pManager == nullptr)
+	{
+		s_pManager = new CManager;
+	}
+	return s_pManager;
 }

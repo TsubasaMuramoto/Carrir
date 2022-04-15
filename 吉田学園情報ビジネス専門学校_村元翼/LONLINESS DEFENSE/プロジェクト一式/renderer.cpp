@@ -127,24 +127,24 @@ HRESULT CRenderer::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 void CRenderer::Uninit(void)
 {
 	// デバッグ情報表示用フォントの破棄
-	if (m_pFont != NULL)
+	if (m_pFont != nullptr)
 	{
 		m_pFont->Release();
-		m_pFont = NULL;
+		m_pFont = nullptr;
 	}
 
 	// デバイスの破棄
-	if (m_pD3DDevice != NULL)
+	if (m_pD3DDevice != nullptr)
 	{
 		m_pD3DDevice->Release();
-		m_pD3DDevice = NULL;
+		m_pD3DDevice = nullptr;
 	}
 
 	// Direct3Dオブジェクトの破棄
-	if (m_pD3D != NULL)
+	if (m_pD3D != nullptr)
 	{
 		m_pD3D->Release();
-		m_pD3D = NULL;
+		m_pD3D = nullptr;
 	}
 }
 
@@ -178,7 +178,7 @@ void CRenderer::Draw(void)
 		// FPS表示
 		DrawFPS();
 
-		if (CManager::GetMode() == CManager::MODE_GAME)
+		if (CManager::GetInstance()->GetMode() == CManager::GetInstance()->MODE_GAME)
 		{
 			DrawTXT();	// デバッグテキスト表示
 		}

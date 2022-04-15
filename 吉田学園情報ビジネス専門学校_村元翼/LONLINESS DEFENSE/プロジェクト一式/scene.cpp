@@ -92,13 +92,13 @@ void CScene::UpdateAll(void)
 {
 	for (int nObj = 0; nObj < OBJTYPE_MAX; nObj++)
 	{
-		if (!CManager::GetPause())						// ポーズ状態がfalseなら
+		if (!CManager::GetInstance()->GetPause())				// ポーズ状態がfalseなら
 		{
 			if (m_pTop[nObj] != nullptr)
 			{
 				CScene *m_pUpdate = m_pTop[nObj];				// 次に更新するオブジェクトの格納
 
-				while (m_pUpdate != nullptr)						// m_pUpdateにNULLが入るまで
+				while (m_pUpdate != nullptr)					// m_pUpdateにNULLが入るまで
 				{
 					m_pUpdate->Update();
 					m_pUpdate = m_pUpdate->m_pNext;
@@ -234,7 +234,7 @@ void CScene::ReleaseAll(void)
 }
 
 //=============================================================================
-//オブジェクト単体のインスタンス破棄
+// オブジェクト単体のインスタンス破棄
 //=============================================================================
 void CScene::Release(void)
 {

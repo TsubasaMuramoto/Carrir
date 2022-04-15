@@ -229,10 +229,10 @@ void CTexture::Uninit(void)
 	for (int nCntTexture = 0; nCntTexture < Max; nCntTexture++)
 	{
 		//テクスチャの破棄
-		if (m_pTexture[nCntTexture] != NULL)
+		if (m_pTexture[nCntTexture] != nullptr)
 		{
 			m_pTexture[nCntTexture]->Release();
-			m_pTexture[nCntTexture] = NULL;
+			m_pTexture[nCntTexture] = nullptr;
 		}
 	}
 }

@@ -29,16 +29,6 @@ CScore::CScore(OBJTYPE nPriority) : CScene(nPriority)
 //---------------------------------------------------
 CScore::~CScore()
 {
-	// ナンバーの破棄
-	for (int nCnt = 0; nCnt < MAX_SCORE; nCnt++)
-	{
-		if (m_apNumber != nullptr)
-		{
-			m_apNumber[nCnt]->Uninit();
-			delete m_apNumber[nCnt];
-			m_apNumber[nCnt] = nullptr;
-		}
-	}
 }
 
 //---------------------------------------------------
@@ -90,6 +80,16 @@ HRESULT CScore::Init(void)
 //---------------------------------------------------
 void CScore::Uninit()
 {
+	// ナンバーの破棄
+	for (int nCnt = 0; nCnt < MAX_SCORE; nCnt++)
+	{
+		if (m_apNumber != nullptr)
+		{
+			m_apNumber[nCnt]->Uninit();
+			m_apNumber[nCnt] = nullptr;
+		}
+	}
+
 	CPlayData::SetScore(m_nScore);
 	m_nAll = 0;
 	Release();
@@ -101,7 +101,7 @@ void CScore::Uninit()
 void CScore::Update()
 {
 #if _DEBUG
-	if (CManager::GetKeyboard()->GetTrigger(DIK_0) == true)
+	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_0))
 	{
 		AddScore(m_nAddScore);	// スコアの加算
 	}

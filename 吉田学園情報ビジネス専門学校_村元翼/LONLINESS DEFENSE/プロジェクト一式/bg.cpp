@@ -69,7 +69,7 @@ void CBg::Update(void)
 	CScene2D::Update();
 	BgLimit();
 
-	if (m_bCanScroll == true)
+	if (m_bCanScroll)
 	{
 		m_pos += CGame::GetScroll();				// 実際にスクロールした量
 		m_Tex += CGame::GetScroll() * 0.001f;		// 背景スピードを取得&調整

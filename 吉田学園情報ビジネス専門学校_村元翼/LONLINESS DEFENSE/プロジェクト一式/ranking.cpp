@@ -78,23 +78,25 @@ HRESULT CRanking::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 			RANKING_RANK_POLYGON_SIZE
 		);
 
+		// テクスチャの取得
+		CTexture *pTex = CManager::GetInstance()->GetTexture();
+
 		switch (nCntRanking)
 		{
 		case 0:
-			m_apScene2D[nCntRanking]->BindTexture(CManager::GetTexture()->Rank1);
-
+			m_apScene2D[nCntRanking]->BindTexture(pTex->Rank1);
 			break;
 		case 1:
-			m_apScene2D[nCntRanking]->BindTexture(CManager::GetTexture()->Rank2);
+			m_apScene2D[nCntRanking]->BindTexture(pTex->Rank2);
 			break;
 		case 2:
-			m_apScene2D[nCntRanking]->BindTexture(CManager::GetTexture()->Rank3);
+			m_apScene2D[nCntRanking]->BindTexture(pTex->Rank3);
 			break;
 		case 3:
-			m_apScene2D[nCntRanking]->BindTexture(CManager::GetTexture()->Rank4);
+			m_apScene2D[nCntRanking]->BindTexture(pTex->Rank4);
 			break;
 		case 4:
-			m_apScene2D[nCntRanking]->BindTexture(CManager::GetTexture()->Rank5);
+			m_apScene2D[nCntRanking]->BindTexture(pTex->Rank5);
 			break;
 		}
 	}
@@ -116,14 +118,14 @@ HRESULT CRanking::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 	}
 	fclose(pFile);
 
-	//プレイデータの取得
-	CPlayData *pPlayData = CManager::GetPlayData();
+	// プレイデータの取得
+	CPlayData *pPlayData = CManager::GetInstance()->GetPlayData();
 
-	//プレイデータに保存してある今回のスコアを変数に保存
+	// プレイデータに保存してある今回のスコアを変数に保存
 	m_nScore[MAX_SCORE_DATA - 1] = pPlayData->GetScore();
 	m_nNowScore = pPlayData->GetScore();
 
-	//ソート
+	// ソート
 	for (int nCntRanking = 0; nCntRanking < MAX_SCORE_DATA; nCntRanking++)
 	{
 		for (int nCntRanking2 = 0; nCntRanking2 < MAX_SCORE_DATA - 1; nCntRanking2++)
@@ -280,7 +282,7 @@ void CRanking::Update(void)
 	}
 
 #ifdef _DEBUG
-	CInputkeyboard *pKey = CManager::GetKeyboard();
+	CInputkeyboard *pKey = CManager::GetInstance()->GetKeyboard();
 	if (pKey->GetTrigger(DIK_R))
 	{
 		m_bClear = true;

@@ -137,13 +137,13 @@ void CNumber::Draw(void)
 CNumber* CNumber::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 {
 	//インスタンスの生成
-	CNumber *pNumber = NULL;
-	if (pNumber == NULL)
+	CNumber *pNumber = nullptr;
+	if (pNumber == nullptr)
 	{
 		pNumber = new CNumber;
-		if (pNumber != NULL)
+		if (pNumber != nullptr)
 		{
-			m_pTexture = CManager::GetTexture()->GetTexture(CTexture::Number);
+			m_pTexture = CManager::GetInstance()->GetTexture()->GetTexture(CTexture::Number);
 			pNumber->Init(pos, size);
 		}
 	}

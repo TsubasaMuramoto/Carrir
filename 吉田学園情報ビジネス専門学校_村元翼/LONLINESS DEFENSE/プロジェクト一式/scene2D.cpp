@@ -47,7 +47,7 @@ CScene2D *CScene2D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, CTexture::Type tex
 //=============================================================================
 void CScene2D::BindTexture(CTexture::Type type)
 {
-	m_pTexture = CManager::GetTexture()->GetTexture(type);
+	m_pTexture = CManager::GetInstance()->GetTexture()->GetTexture(type);
 }
 
 //=============================================================================
@@ -104,10 +104,10 @@ HRESULT CScene2D::Init(void)
 void CScene2D::Uninit(void)
 {
 	// 頂点バッファの破棄
-	if (m_pVtxBuff != NULL)
+	if (m_pVtxBuff != nullptr)
 	{
 		m_pVtxBuff->Release();
-		m_pVtxBuff = NULL;
+		m_pVtxBuff = nullptr;
 	}
 	Release();
 }

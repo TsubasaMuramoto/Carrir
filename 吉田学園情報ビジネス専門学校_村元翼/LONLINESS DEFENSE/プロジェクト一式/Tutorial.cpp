@@ -9,6 +9,7 @@
 #include "fade.h"
 #include "polygon.h"
 #include "XInput.h"
+#include "sound.h"
 
 //--------------------------------------------
 // コンストラクタ
@@ -58,14 +59,16 @@ void CTutorial::Uninit(void)
 void CTutorial::Update(void)
 {
 	// 入力デバイスの取得
-	CInputkeyboard *pKey = CManager::GetKeyboard();
-	CXInput *pGamePad = CManager::GetXInput();
+	CInputkeyboard *pKey = CManager::GetInstance()->GetKeyboard();
+	CXInput *pGamePad = CManager::GetInstance()->GetXInput();
+	CSound *pSound = CManager::GetInstance()->GetSound();
 
 	// Enterでモード変更
-	if ((pGamePad->GetButtonTrigger(XINPUT_GAMEPAD_START) || pKey->GetTrigger(DIK_RETURN) == true) && m_bNextMode == false && m_pTutorial[1] != nullptr)
+	if ((pGamePad->GetButtonTrigger(XINPUT_GAMEPAD_START) || pKey->GetTrigger(DIK_RETURN)) && !m_bNextMode && m_pTutorial[1] != nullptr)
 	{
-		CFade::SetFade(CManager::MODE_GAME);			// ゲームモードへ
-		m_bNextMode = true;								// ENTER連打防止
+		CFade::SetFade(CManager::MODE_GAME);				// ゲームモードへ
+		m_bNextMode = true;									// ENTER連打防止
+		pSound->PlaySound(pSound->SOUND_LABEL_SE_DECIDE);	// 決定音
 	}
 
 	// ページを変える
@@ -73,6 +76,7 @@ void CTutorial::Update(void)
 	{
 		m_pTutorial[0]->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f));
 		m_pTutorial[1] = CScene2D::Create(D3DXVECTOR3(SCREEN_WIDTH / 2, 350.0f, 0.0f), D3DXVECTOR3(1000.0f, 600.0f, 0.0f), CTexture::Tutorial02, CScene::OBJTYPE_BG);
+		pSound->PlaySound(pSound->SOUND_LABEL_SE_ENTER);	// 決定音
 	}
 }
 //--------------------------------------------

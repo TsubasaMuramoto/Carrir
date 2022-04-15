@@ -11,6 +11,7 @@
 #include "polygon.h"
 #include "fade.h"
 #include "bg.h"
+#include "sound.h"
 #include <assert.h>
 
 //-------------------------------------------
@@ -35,8 +36,10 @@ CPause::CPause(OBJTYPE nPriority) :CScene(nPriority)
 	// メンバ変数の初期化
 	memset(m_pPolygon, 0, sizeof(m_pPolygon));
 	m_pCursor = nullptr;
+	m_pTutorialUI = nullptr;
 	m_bNextMode = false;
 	m_bUninit = false;
+	m_bMoveCursor = true;
 	m_nPauseType = 0;
 	m_fAlpha = 0.0f;
 }
@@ -107,28 +110,25 @@ void CPause::Uninit(void)
 		if (m_pPolygon[nCnt] != nullptr)
 		{
 			m_pPolygon[nCnt]->Uninit();
-			delete m_pPolygon[nCnt];
+			m_pPolygon[nCnt] = nullptr;
 		}
-
 	}
 
 	if (m_pCursor != nullptr)
 	{
 		m_pCursor->Uninit();
-		delete m_pCursor;
 		m_pCursor = nullptr;
 	}
 
 	// ポーズ背景の破棄
 	if (m_pBg != nullptr)
 	{
-		m_pBg->Uninit();
-		delete m_pBg;
+		m_pBg->Uninit();;
 		m_pBg = nullptr;
 	}
 
-	CManager::SetPause(false,false);	// ポーズの状態をfalseにする
-	Release();							// オブジェクトの破棄
+	CManager::GetInstance()->SetPause(false,false);	// ポーズの状態をfalseにする
+	Release();										// オブジェクトの破棄
 }
 
 //--------------------------
@@ -136,9 +136,10 @@ void CPause::Uninit(void)
 //--------------------------
 void CPause::Update(void)
 {
-	// ゲームパッドの取得
-	CXInput *pXInput = CManager::GetXInput();
-	CInputkeyboard *pKey = CManager::GetKeyboard();
+	// オブジェクト取得
+	CXInput *pXInput = CManager::GetInstance()->GetXInput();
+	CInputkeyboard *pKey = CManager::GetInstance()->GetKeyboard();
+	CSound *pSound = CManager::GetInstance()->GetSound();
 
 	// 上に行く
 	if (pKey->GetTrigger(DIK_W) || pXInput->GetButtonTrigger(XINPUT_GAMEPAD_DPAD_UP))
@@ -149,6 +150,7 @@ void CPause::Update(void)
 		{
 			m_nPauseType = SELECT_MAX - 1;
 		}
+		m_bMoveCursor = true;
 	}
 
 	// 下に行く
@@ -160,61 +162,54 @@ void CPause::Update(void)
 		{
 			m_nPauseType = 0;
 		}
+		m_bMoveCursor = true;
 	}
 
 	// カーソルの位置を変える
-	if (m_pCursor != nullptr)
+	if (m_bMoveCursor)
 	{
-		switch (m_nPauseType)
+		if (m_pCursor != nullptr)
 		{
-		case SELECT_RETURNGAME:
-			m_pCursor->SetPos(D3DXVECTOR3(m_pPolygon[0]->GetPos().x - m_pPolygon[0]->GetScale().x, m_pPolygon[0]->GetPos().y, 0.0f), m_pCursor->GetScale());
-			break;
+			pSound->PlaySound(pSound->SOUND_LABEL_SE_MOVE_CURSOR);
 
-		case SELECT_RETRY:
-			m_pCursor->SetPos(D3DXVECTOR3(m_pPolygon[1]->GetPos().x - m_pPolygon[1]->GetScale().x, m_pPolygon[1]->GetPos().y, 0.0f), m_pCursor->GetScale());
-			break;
+			switch (m_nPauseType)
+			{
+			case SELECT_RETURNGAME:
+				m_pCursor->SetPos(D3DXVECTOR3(m_pPolygon[0]->GetPos().x - m_pPolygon[0]->GetScale().x, m_pPolygon[0]->GetPos().y, 0.0f), m_pCursor->GetScale());
+				break;
 
-		case SELECT_RETURNTITLE:
-			m_pCursor->SetPos(D3DXVECTOR3(m_pPolygon[2]->GetPos().x - m_pPolygon[2]->GetScale().x, m_pPolygon[2]->GetPos().y, 0.0f), m_pCursor->GetScale());
-			break;
+			case SELECT_RETRY:
+				m_pCursor->SetPos(D3DXVECTOR3(m_pPolygon[1]->GetPos().x - m_pPolygon[1]->GetScale().x, m_pPolygon[1]->GetPos().y, 0.0f), m_pCursor->GetScale());
+				break;
 
+			case SELECT_RETURNTITLE:
+				m_pCursor->SetPos(D3DXVECTOR3(m_pPolygon[2]->GetPos().x - m_pPolygon[2]->GetScale().x, m_pPolygon[2]->GetPos().y, 0.0f), m_pCursor->GetScale());
+				break;
+			}
+
+			m_bMoveCursor = false;
 		}
 	}
 
 	// 選択を決定する
 	if ((pKey->GetTrigger(DIK_RETURN) || pXInput->GetButtonTrigger(XINPUT_GAMEPAD_A)) && !m_bNextMode)
 	{
+		pSound->PlaySound(pSound->SOUND_LABEL_SE_DECIDE);
+
 		switch (m_nPauseType)
 		{
-		case SELECT_RETURNGAME:	//ゲームに戻る
-			CManager::SetPause(false,false);
+		case SELECT_RETURNGAME:		// ゲームに戻る
+			CManager::GetInstance()->SetPause(false, false);
 			break;
-		case SELECT_RETRY:	//リトライ
-			CFade::SetFade(CManager::MODE_GAME);
+		case SELECT_RETRY:			// リトライ
+			CFade::SetFade(CManager::GetInstance()->MODE_GAME);
 			break;
-		case SELECT_RETURNTITLE:	//タイトル画面
-			CFade::SetFade(CManager::MODE_TITLE);
+		case SELECT_RETURNTITLE:	// タイトル画面
+			CFade::SetFade(CManager::GetInstance()->MODE_TITLE);
 			break;
 		}
 		m_bNextMode = true;
 	}
-
-	//---------------------------------------------------------------//
-	// Uninitが呼ばれるとSceneでの更新が止まるから一回のみ通る仕組み //
-	//---------------------------------------------------------------//
-	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ //
-	// ポーズ状態がfalseなら
-	if (!CManager::GetPause())
-	{
-		m_bUninit = true;	// 
-	}
-
-	if (m_bUninit)
-	{
-		Uninit();
-	}
-
 }
 
 //--------------------------

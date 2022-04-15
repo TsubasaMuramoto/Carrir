@@ -59,6 +59,7 @@ private:
 	int				m_nPauseType;					// ポーズ選択
 	bool			m_bUninit;						// pauseを終了させるか
 	bool			m_bNextMode;					// 次のモードにいくか
+	bool			m_bMoveCursor;					// カーソルが動いているか
 	CScene2D		*m_pPolygon[SELECT_MAX];		// ポーズ選択のポリゴン
 	CScene2D		*m_pCursor;						// 選択カーソルのポリゴン
 	CScene2D		*m_pTutorialUI;					// 操作説明UI

@@ -59,7 +59,6 @@ void CTitle::Uninit(void)
 		if (m_pTitle[nCnt] != nullptr)
 		{
 			m_pTitle[nCnt]->Uninit();
-			delete m_pTitle[nCnt];
 			m_pTitle[nCnt] = nullptr;
 		}
 	}
@@ -71,8 +70,8 @@ void CTitle::Uninit(void)
 void CTitle::Update(void)
 {
 	// オブジェクト取得
-	CInputkeyboard *pKey = CManager::GetKeyboard();
-	CXInput *pGamePad = CManager::GetXInput();
+	CInputkeyboard *pKey = CManager::GetInstance()->GetKeyboard();
+	CXInput *pGamePad = CManager::GetInstance()->GetXInput();
 
 	// press start点滅処理
 	if (m_pTitle[1] != nullptr)
@@ -94,11 +93,12 @@ void CTitle::Update(void)
 	if (pGamePad->GetButtonTrigger(XINPUT_GAMEPAD_START) || pKey->GetTrigger(DIK_RETURN) && !m_bNextMode)
 	{
 		// オブジェクト取得
-		CSound *pSound = CManager::GetSound();
+		CSound *pSound = CManager::GetInstance()->GetSound();
 
 		m_nMultiFrame = BLINK_SPEED;
-		CFade::SetFade(CManager::MODE_TUTORIAL);		// ゲームモードへ
-		m_bNextMode = true;								// ENTER連打防止
+		CFade::SetFade(CManager::MODE_TUTORIAL);			// ゲームモードへ
+		m_bNextMode = true;									// ENTER連打防止
+		pSound->PlaySound(pSound->SOUND_LABEL_SE_DECIDE);	// 決定音
 	}
 }
 

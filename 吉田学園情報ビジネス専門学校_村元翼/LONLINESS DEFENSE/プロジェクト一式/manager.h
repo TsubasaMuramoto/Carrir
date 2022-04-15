@@ -22,6 +22,9 @@ class CMouse;
 class CXInput;
 class CPlayData;
 class CSound;
+//--------------------------------------
+// クラス定義
+//--------------------------------------
 class CManager
 {
 public:
@@ -38,8 +41,7 @@ public:
 		MODE_MAX
 	}MODE;
 
-	CManager();
-	~CManager();
+
 	HRESULT Init(HINSTANCE hInstance, HWND hWnd, bool bWindow);
 	void Uninit(void);
 	void Update(void);
@@ -48,22 +50,33 @@ public:
 	//----------------------------
 	// Getter & Setter
 	//----------------------------
-	static CRenderer *GetRenderer(void)		{ return m_pRenderer; }		// レンダラーの取得
-	static CTexture *GetTexture(void)		{ return m_pTexture; }		// テクスチャの取得
-	static CInputkeyboard *GetKeyboard()	{ return m_pKeyboard; }		// キーボードの取得
-	static CMouse *GetMouse()				{ return m_pMouse; }		// マウスの取得
-	static CGame *GetGame(void)				{ return m_pGame; }			// ゲームの取得
-	static bool GetStop(void)				{ return m_bPause; }		// ポーズ判定の取得
-	static CPause *GetPause(void)			{ return m_pPause; }		// ポーズの取得
-	static CXInput *GetXInput(void)			{ return m_pXInput; }		// Xinputの取得
-	static MODE GetMode(void)				{ return m_Mode; }			// モードの取得
-	static CPlayData *GetPlayData(void)		{ return m_pPlayData; }		// プレイデータ取得
-	static CSound *GetSound(void)			{ return m_pSound; }		// サウンド取得
+	static CManager			*GetInstance(void);									// インスタンス取得
+	static CRenderer		*GetRenderer(void)		{ return m_pRenderer; }		// レンダラーの取得
+	static CTexture			*GetTexture(void)		{ return m_pTexture; }		// テクスチャの取得
+	static CInputkeyboard	*GetKeyboard()			{ return m_pKeyboard; }		// キーボードの取得
+	static CMouse			*GetMouse()				{ return m_pMouse; }		// マウスの取得
+	static CGame			*GetGame(void)			{ return m_pGame; }			// ゲームの取得
+	static CPause			*GetPause(void)			{ return m_pPause; }		// ポーズの取得
+	static CXInput			*GetXInput(void)		{ return m_pXInput; }		// Xinputの取得
+	static CPlayData		*GetPlayData(void)		{ return m_pPlayData; }		// プレイデータ取得
+	static CSound			*GetSound(void)			{ return m_pSound; }		// サウンド取得
+	static MODE				GetMode(void)			{ return m_Mode; }			// モードの取得
+	static bool				GetStop(void)			{ return m_bPause; }		// ポーズ判定の取得
 
 	static void SetMode(MODE mode);																	// モードの設定
 	static void SetPause(bool bPause, bool bStop = false) { m_bPause = bPause; m_bStop = bStop;}	// ポーズの設定
 
 private:
+	//---------------------------------------------------
+	// コンストラクタ・デストラクタ
+	//---------------------------------------------------
+	CManager();
+	~CManager();
+
+	//---------------------------------------------------
+	// メンバ変数
+	//---------------------------------------------------
+	static CManager			*s_pManager;		// マネージャーのクラス
 	static CTitle			*m_pTitle;			// タイトルクラス
 	static CGame			*m_pGame;			// ゲームクラス
 	static CTutorial		*m_pTutorial;		// チュートリアルクラス

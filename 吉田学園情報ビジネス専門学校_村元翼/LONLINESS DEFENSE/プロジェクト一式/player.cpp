@@ -97,8 +97,8 @@ void CPlayer::Uninit(void)
 //=============================================================================
 void CPlayer::Update(void)
 {
-	CXInput *pGamePad = CManager::GetXInput();
-	CMouse *pMouse = CManager::GetMouse();
+	CXInput *pGamePad = CManager::GetInstance()->GetXInput();
+	CMouse *pMouse = CManager::GetInstance()->GetMouse();
 
 	CScene2D::Update();
 	CScene::SetMove(m_Speed);
@@ -119,6 +119,11 @@ void CPlayer::Update(void)
 		// マウスクリックorゲームパッドR2
 		if (pMouse->GetPress(pMouse->MOUSE_LEFT) || pGamePad->GetGamePad()->m_state.Gamepad.bRightTrigger >= XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
 		{
+			// サウンド再生取得
+			CSound *pSound = CManager::GetInstance()->GetSound();
+			pSound->ControllVoice(pSound->SOUND_LABEL_SE_BULLET, 0.5f);
+			pSound->PlaySound(pSound->SOUND_LABEL_SE_BULLET);
+
 			CBullet::Create(m_pos, BULLET_SIZE, m_fAngle);						// 弾を生成
 			m_fShootInterval = SHOOT_INTERVAL;									// 弾のインターバルを設定する
 			pGamePad->SetVibration(VIBRATION_POWER_MAX, VIBRATION_POWER_MAX);	// コントローラ振動
@@ -175,7 +180,7 @@ CPlayer *CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, CTexture::Type text
 void CPlayer::Move(void)
 {
 	// ゲームパッドが接続されているか
-	CXInput *pXInput = CManager::GetXInput();
+	CXInput *pXInput = CManager::GetInstance()->GetXInput();
 	XINPUT_STATE state;
 	DWORD IsConnected = XInputGetState(0, &state);
 	if (IsConnected == ERROR_SUCCESS)
@@ -258,11 +263,11 @@ void CPlayer::Move(void)
 	//==========================================================================================================
 	// 移動に使う関数
 	//==========================================================================================================
-	GetCursorPos(&m_Point);									// マウスカーソル座標の取得(スクリーン座標)
-	ScreenToClient(CRenderer::GethWnd(), &m_Point);			// マウスのスクリーン座標をクライアント座標に変換
-	Acceleration(m_velocity, m_Speed, m_fMaxSpeed);			// 慣性
-	Rotate(m_pos, m_scale, m_fAngle);						// 回転
-	MovingLimit(m_pos, m_scale, m_Speed);					// 移動限界
+	GetCursorPos(&m_Point);											// マウスカーソル座標の取得(スクリーン座標)
+	ScreenToClient(CManager::GetRenderer()->GethWnd(), &m_Point);	// マウスのスクリーン座標をクライアント座標に変換
+	Acceleration(m_velocity, m_Speed, m_fMaxSpeed);					// 慣性
+	Rotate(m_pos, m_scale, m_fAngle);								// 回転
+	MovingLimit(m_pos, m_scale, m_Speed);							// 移動限界
 
 }
 
@@ -541,8 +546,8 @@ float CPlayer::RotateGamePad(CXInput *pXInput)
 //=============================================================================
 bool CPlayer::InputDirection(const MOVE_DIRECTION &moveDir)
 {
-	CXInput *pXInput = CManager::GetXInput();
-	CInputkeyboard *pKey = CManager::GetKeyboard();
+	CXInput *pXInput = CManager::GetInstance()->GetXInput();
+	CInputkeyboard *pKey = CManager::GetInstance()->GetKeyboard();
 
 	switch (moveDir)
 	{

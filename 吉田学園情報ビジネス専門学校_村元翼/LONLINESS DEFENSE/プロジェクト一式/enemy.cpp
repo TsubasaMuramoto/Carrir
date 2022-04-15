@@ -15,6 +15,7 @@
 #include "MiniPolygon.h"
 #include "collision.h"
 #include "effect.h"
+#include "sound.h"
 
 //=============================================================================
 // 静的メンバ変数の初期化
@@ -85,10 +86,14 @@ HRESULT CEnemy::Init(void)
 //=============================================================================
 void CEnemy::Uninit(void)
 {
+	// サウンド再生取得
+	CSound *pSound = CManager::GetInstance()->GetSound();
+	pSound->ControllVoice(pSound->SOUND_LABEL_SE_ENEMY_EXPLOSION, 0.5f);
+	pSound->PlaySound(pSound->SOUND_LABEL_SE_ENEMY_EXPLOSION);
+
 	if (m_pMiniEnemy != nullptr)
 	{
 		m_pMiniEnemy->Uninit();
-		delete m_pMiniEnemy;
 		m_pMiniEnemy = nullptr;
 	}
 
@@ -115,7 +120,7 @@ void CEnemy::Update(void)
 		// ターゲットとの当たり判定
 		//----------------------------------------------------------------------
 		CScene *pScene = CScene::GetScene(CScene::OBJTYPE_TARGET);
-		while (pScene != NULL)
+		while (pScene != nullptr)
 		{
 			// 次のシーンを取得
 			CScene *pSceneNext = CScene::GetSceneNext(pScene);
@@ -132,15 +137,15 @@ void CEnemy::Update(void)
 		//----------------------------------------------------------------------
 		CCollision *pCollision = new CCollision;
 		CScene *pScene2 = CScene::GetScene(CScene::OBJTYPE_PLAYER);
-		while (pScene2 != NULL)
+		while (pScene2 != nullptr)
 		{
 			// 次のシーンを取得
 			CScene *pSceneNext2 = CScene::GetSceneNext(pScene2);
 
-			if (pScene2 != NULL)
+			if (pScene2 != nullptr)
 			{
 				// 四角と四角の当たり判定
-				if (pCollision->SetCollision(this, pScene2) == true)
+				if (pCollision->SetCollision(this, pScene2))
 				{
 					CEffect::Create(
 						m_pos,
@@ -163,11 +168,10 @@ void CEnemy::Update(void)
 
 		if (pCollision != nullptr)
 		{
+			pCollision->Uninit();
 			delete pCollision;
 			pCollision = nullptr;
 		}
-
-
 	}
 
 	// フレームカウント

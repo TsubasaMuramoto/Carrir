@@ -55,12 +55,16 @@ void CResult::Uninit(void)
 void CResult::Update(void)
 {
 	// 入力デバイスの取得
-	CInputkeyboard *pKey = CManager::GetKeyboard();
-	CXInput *pGamePad = CManager::GetXInput();	
+	CInputkeyboard *pKey = CManager::GetInstance()->GetKeyboard();
+	CXInput *pGamePad = CManager::GetInstance()->GetXInput();
 
 	// ENTERを押す
 	if (pGamePad->GetButtonTrigger(XINPUT_GAMEPAD_START) || pKey->GetTrigger(DIK_RETURN) && !m_bNextMode)
 	{
+		// サウンド再生取得
+		CSound *pSound = CManager::GetInstance()->GetSound();
+		pSound->PlaySound(pSound->SOUND_LABEL_SE_DECIDE);
+
 		CFade::SetFade(CManager::MODE_TITLE);			// ゲームモードへ
 		m_bNextMode = true;								// ENTER連打防止
 	}

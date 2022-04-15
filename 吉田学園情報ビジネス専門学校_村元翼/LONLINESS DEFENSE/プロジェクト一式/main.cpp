@@ -27,12 +27,6 @@ int						g_nCountFPS;			// FPSカウンタ
 //=============================================================================
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	//------------------------------------------
-	// メモリ動的確保
-	//------------------------------------------
-	CManager *pManager;
-	pManager = new CManager;
-
 	WNDCLASSEX wcex =
 	{
 		sizeof(WNDCLASSEX),
@@ -79,10 +73,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		NULL
 	);
 
-	//------------------------------------------
 	// 初期化処理
-	//------------------------------------------
-	pManager->Init(hInstance, hWnd, TRUE);
+	if (FAILED(CManager::GetInstance()->Init(hInstance, hWnd, TRUE)))
+	{
+		return -1;
+	}
 
 	// 分解能を設定
 	timeBeginPeriod(1);
@@ -131,14 +126,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				dwExecLastTime = dwCurrentTime;	// 現在の時間を保存
 
 				//------------------------------------------
-				// 更新処理
+				// 更新・描画処理
 				//------------------------------------------
-				pManager->Update();
-
-				//------------------------------------------
-				// 描画処理
-				//------------------------------------------
-				pManager->Draw();
+				CManager::GetInstance()->Update(); // 更新
+				CManager::GetInstance()->Draw();   // 描画
 
 				dwFrameCount++;
 			}
@@ -148,7 +139,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//------------------------------------------
 	// 終了処理
 	//------------------------------------------
-	pManager->Uninit();
+	if (CManager::GetInstance() != nullptr)
+	{
+		CManager::GetInstance()->Uninit();
+	}
 
 	// ウィンドウクラスの登録を解除
 	UnregisterClass(CLASS_NAME, wcex.hInstance);

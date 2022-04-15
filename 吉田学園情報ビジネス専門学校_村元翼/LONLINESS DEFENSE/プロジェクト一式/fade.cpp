@@ -11,9 +11,9 @@
 // 静的メンバ変数宣言
 //-------------------------------------------------------------------
 CFade::FADE					CFade::m_fade = CFade::FADE_IN;
-CManager::MODE				CFade::m_modeNext = CManager::MODE_TITLE;
+CManager::MODE				CFade::m_modeNext = CManager::GetInstance()->MODE_TITLE;
 float						CFade::m_colorAlpha = 1.0f;
-CBg							*CFade::m_pBg = NULL;
+CBg							*CFade::m_pBg = nullptr;
 
 //--------------------------------------------
 // コンストラクタ
@@ -98,7 +98,7 @@ void CFade::Update(void)
 				m_fade = FADE_IN;
 
 				// モードの設定
-				CManager::SetMode(m_modeNext);
+				CManager::GetInstance()->SetMode(m_modeNext);
 			}
 		}
 	}
